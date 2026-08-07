@@ -1,0 +1,33 @@
+# Dépendances
+node_modules/
+
+# Sortie de compilation TypeScript
+dist/
+build/
+*.tsbuildinfo
+
+# Variables d'environnement (ne jamais committer de secrets)
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Couverture de tests
+coverage/
+
+# Cache d'outils
+.cache/
+
+# Fichiers système / OS
+.DS_Store
+Thumbs.db
+
+# Éditeurs / IDE
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
