@@ -5,6 +5,7 @@ import express from 'express';
 import { config } from './config/env';
 import { checkDatabaseConnection } from './db/pool';
 import { tournamentsRouter } from './routes/tournaments';
+import { gamesRouter } from './routes/games';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get('/', (_req, res) => {
 });
 
 app.use('/tournaments', tournamentsRouter);
+app.use('/tournaments/:tournamentId/games', gamesRouter);
 
 // Gestion des erreurs (doit rester le dernier middleware)
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

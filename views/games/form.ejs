@@ -1,0 +1,61 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/games">← Jeux</a></p>
+
+<h1><%= title %></h1>
+
+<% if (errors.length > 0) { %>
+  <ul class="error">
+    <% errors.forEach(function (err) { %>
+      <li><%= err %></li>
+    <% }); %>
+  </ul>
+<% } %>
+
+<form method="post" action="<%= formAction %>">
+  <label>
+    Nom
+    <input type="text" name="name" value="<%= values.name %>" required maxlength="100" autofocus>
+  </label>
+
+  <label>
+    Durée (minutes, facultatif)
+    <input type="number" name="duration_min" value="<%= values.duration_min %>" min="0">
+  </label>
+
+  <label>
+    Joueurs minimum par table
+    <input type="number" name="min_players" value="<%= values.min_players %>" min="1" required>
+  </label>
+
+  <label>
+    Joueurs maximum par table
+    <input type="number" name="max_players" value="<%= values.max_players %>" min="1" required>
+  </label>
+
+  <label class="checkbox">
+    <input type="checkbox" name="is_team_game" <%= values.is_team_game ? 'checked' : '' %>>
+    Jeu en équipe (sinon chacun pour soi)
+  </label>
+
+  <label>
+    Lien vers les règles (facultatif)
+    <input type="url" name="rules_url" value="<%= values.rules_url %>" placeholder="https://...">
+  </label>
+
+  <label>
+    Présence dans le tournoi
+    <select name="availability">
+      <option value="both" <%= values.availability === 'both' ? 'selected' : '' %>>Poule + Finale</option>
+      <option value="pool" <%= values.availability === 'pool' ? 'selected' : '' %>>Poule uniquement</option>
+      <option value="final" <%= values.availability === 'final' ? 'selected' : '' %>>Finale uniquement</option>
+    </select>
+  </label>
+
+  <div class="form-actions">
+    <button type="submit">Enregistrer</button>
+    <a href="/tournaments/<%= tournament.id %>/games">Annuler</a>
+  </div>
+</form>
+
+<%- include('../partials/footer') %>

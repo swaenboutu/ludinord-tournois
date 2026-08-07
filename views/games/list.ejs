@@ -1,0 +1,53 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>">← <%= tournament.name %></a></p>
+
+<h1>Jeux</h1>
+
+<p><a class="button" href="/tournaments/<%= tournament.id %>/games/new">+ Nouveau jeu</a></p>
+
+<% if (games.length === 0) { %>
+  <p>Aucun jeu pour le moment.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Type</th>
+        <th>Joueurs</th>
+        <th>Durée</th>
+        <th>Présence</th>
+        <th>Règles</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% games.forEach(function (game) { %>
+        <tr>
+          <td><%= game.name %></td>
+          <td><%= game.is_team_game ? 'Équipe' : 'Solo' %></td>
+          <td><%= game.min_players %>–<%= game.max_players %></td>
+          <td><%= game.duration_min ? game.duration_min + ' min' : '—' %></td>
+          <td>
+            <%= game.availability === 'pool' ? 'Poule'
+              : (game.availability === 'final' ? 'Finale' : 'Poule + Finale') %>
+          </td>
+          <td>
+            <% if (game.rules_url) { %>
+              <a href="<%= game.rules_url %>" target="_blank" rel="noopener">Lien</a>
+            <% } else { %>—<% } %>
+          </td>
+          <td class="row-actions">
+            <a href="/tournaments/<%= tournament.id %>/games/<%= game.id %>/edit">Modifier</a>
+            <form method="post" action="/tournaments/<%= tournament.id %>/games/<%= game.id %>/delete"
+                  onsubmit="return confirm('Supprimer ce jeu ?');">
+              <button type="submit" class="button-danger">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('../partials/footer') %>

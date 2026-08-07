@@ -22,6 +22,15 @@ export async function listTournaments(): Promise<Tournament[]> {
   return rows;
 }
 
+// Récupère un tournoi par son identifiant, ou null s'il n'existe pas
+export async function getTournament(id: number): Promise<Tournament | null> {
+  const [rows] = await pool.execute<TournamentRow[]>(
+    'SELECT id, name, status, created_at, closed_at FROM tournaments WHERE id = ? LIMIT 1',
+    [id],
+  );
+  return rows[0] ?? null;
+}
+
 // Crée un tournoi et retourne son identifiant
 export async function createTournament(name: string): Promise<number> {
   const [result] = await pool.execute<ResultSetHeader>(

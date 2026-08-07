@@ -1,0 +1,39 @@
+<%- include('../partials/header', { title }) %>
+
+<h1>Tournois</h1>
+
+<p><a class="button" href="/tournaments/new">+ Nouveau tournoi</a></p>
+
+<% if (tournaments.length === 0) { %>
+  <p>Aucun tournoi pour le moment.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Statut</th>
+        <th>Créé le</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tournaments.forEach(function (t) { %>
+        <tr>
+          <td><a href="/tournaments/<%= t.id %>"><%= t.name %></a></td>
+          <td><%= t.status === 'open' ? 'En cours' : 'Clôturé' %></td>
+          <td><%= new Date(t.created_at).toLocaleDateString('fr-FR') %></td>
+          <td>
+            <% if (t.status === 'open') { %>
+              <form method="post" action="/tournaments/<%= t.id %>/close"
+                    onsubmit="return confirm('Clôturer ce tournoi ? Cette action est définitive.');">
+                <button type="submit">Clôturer</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('../partials/footer') %>

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import {
   listTournaments,
+  getTournament,
   createTournament,
   closeTournament,
 } from '../repositories/tournamentRepository';
@@ -22,6 +23,19 @@ tournamentsRouter.get(
 tournamentsRouter.get('/new', (_req, res) => {
   res.render('tournaments/new', { title: 'Nouveau tournoi' });
 });
+
+// Détail / hub de configuration d'un tournoi (défini après /new pour ne pas le capturer)
+tournamentsRouter.get(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const tournament = await getTournament(Number(req.params.id));
+    if (tournament === null) {
+      res.status(404).send('Tournoi introuvable');
+      return;
+    }
+    res.render('tournaments/show', { title: tournament.name, tournament });
+  }),
+);
 
 // Création d'un tournoi
 tournamentsRouter.post(
