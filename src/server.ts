@@ -4,6 +4,7 @@ import express from 'express';
 
 import { config } from './config/env';
 import { checkDatabaseConnection } from './db/pool';
+import { tournamentsRouter } from './routes/tournaments';
 
 const app = express();
 
@@ -18,9 +19,17 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Page d'accueil
+// La racine renvoie vers la liste des tournois (point d'entrée de la config)
 app.get('/', (_req, res) => {
-  res.render('home', { title: 'Tournoi de jeux de société' });
+  res.redirect('/tournaments');
+});
+
+app.use('/tournaments', tournamentsRouter);
+
+// Gestion des erreurs (doit rester le dernier middleware)
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(err);
+  res.status(500).send('Erreur interne du serveur');
 });
 
 // Démarrage : on vérifie d'abord la base, puis on écoute

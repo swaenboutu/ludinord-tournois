@@ -1,0 +1,20 @@
+<%- include('../partials/header', { title }) %>
+
+<h1>Nouveau tournoi</h1>
+
+<% if (typeof error !== 'undefined') { %>
+  <p class="error"><%= error %></p>
+<% } %>
+
+<form method="post" action="/tournaments">
+  <label>
+    Nom du tournoi
+    <input type="text" name="name" required maxlength="100" autofocus>
+  </label>
+  <div class="form-actions">
+    <button type="submit">Créer</button>
+    <a href="/tournaments">Annuler</a>
+  </div>
+</form>
+
+<%- include('../partials/footer') %>
