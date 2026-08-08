@@ -14,6 +14,7 @@ export interface PoolRound {
   min_players: number;
   max_players: number;
   table_count: number;
+  validated_count: number; // nb de tables aux résultats saisis (status = validated)
 }
 
 interface PoolRoundRow extends RowDataPacket {
@@ -26,12 +27,14 @@ interface PoolRoundRow extends RowDataPacket {
   min_players: number;
   max_players: number;
   table_count: number;
+  validated_count: number;
 }
 
 const SELECT_ROUNDS = `
   SELECT r.id, r.tournament_id, r.game_id, r.round_order,
          g.name AS game_name, g.is_team_game, g.min_players, g.max_players,
-         (SELECT COUNT(*) FROM parties pa WHERE pa.pool_round_id = r.id) AS table_count
+         (SELECT COUNT(*) FROM parties pa WHERE pa.pool_round_id = r.id) AS table_count,
+         (SELECT COUNT(*) FROM parties pa WHERE pa.pool_round_id = r.id AND pa.status = 'validated') AS validated_count
     FROM pool_rounds r
     JOIN games g ON g.id = r.game_id`;
 
@@ -47,6 +50,7 @@ function mapRound(row: PoolRoundRow): PoolRound {
     min_players: row.min_players,
     max_players: row.max_players,
     table_count: Number(row.table_count),
+    validated_count: Number(row.validated_count),
   };
 }
 

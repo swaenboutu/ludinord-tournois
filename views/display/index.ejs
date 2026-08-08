@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= tournament.name %> — Affichage</title>
+  <link rel="stylesheet" href="/css/display.css">
+</head>
+<body class="display display-menu">
+  <header class="display-header">
+    <h1><%= tournament.name %></h1>
+    <span class="display-phase">Affichage</span>
+  </header>
+
+  <nav class="screen-links">
+    <a href="/tournaments/<%= tournament.id %>/display/pool">Phase de poule</a>
+  </nav>
+</body>
+</html>

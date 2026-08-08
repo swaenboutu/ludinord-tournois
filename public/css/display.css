@@ -1,0 +1,184 @@
+/* ===== Écrans d'affichage TV : sombre, gros contrastes, plein écran ===== */
+:root {
+  --d-bg: #0f1115;
+  --d-panel: #1b1f27;
+  --d-border: #2c313c;
+  --d-text: #f3f5f8;
+  --d-muted: #9aa4b2;
+  --d-accent: #ffd23f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body.display {
+  min-height: 100vh;
+  padding: 2vw 3vw;
+  background: var(--d-bg);
+  color: var(--d-text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* En-tête : nom du tournoi + phase */
+.display-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--d-border);
+  padding-bottom: 1.2vh;
+  margin-bottom: 2.5vh;
+}
+
+.display-header h1 {
+  margin: 0;
+  font-size: 4vw;
+}
+
+.display-phase {
+  font-size: 2vw;
+  color: var(--d-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Jeu en cours / jeu suivant */
+.now-next {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2vw;
+  margin-bottom: 3vh;
+}
+
+.game-card {
+  background: var(--d-panel);
+  border: 1px solid var(--d-border);
+  border-radius: 1vw;
+  padding: 2.5vh 2vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+}
+
+.game-card.current {
+  border-color: var(--d-accent);
+}
+
+.game-label {
+  font-size: 1.8vw;
+  color: var(--d-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.game-card .game-name {
+  font-size: 4.5vw;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.game-card.next .game-name {
+  font-size: 3vw;
+  color: var(--d-muted);
+}
+
+/* Bannière "phase terminée" (remplace jeu en cours / suivant) */
+.finished-banner {
+  margin-bottom: 3vh;
+  padding: 4vh 2vw;
+  background: var(--d-panel);
+  border: 2px solid var(--d-accent);
+  border-radius: 1vw;
+  text-align: center;
+  font-size: 4vw;
+  font-weight: 800;
+  color: var(--d-accent);
+}
+
+/* Classement */
+.standings h2 {
+  margin: 0 0 1.5vh;
+  font-size: 2.4vw;
+}
+
+.standings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+}
+
+.standings-list li {
+  display: flex;
+  align-items: center;
+  gap: 1.5vw;
+  background: var(--d-panel);
+  border: 1px solid var(--d-border);
+  border-radius: 0.8vw;
+  padding: 1.4vh 2vw;
+  font-size: 2.6vw;
+}
+
+.standings-list .rank {
+  min-width: 2.5vw;
+  color: var(--d-muted);
+  font-weight: 700;
+}
+
+.standings-list .swatch {
+  width: 2.4vw;
+  height: 2.4vw;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.standings-list .team {
+  flex: 1;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.standings-list .pts {
+  font-weight: 800;
+  color: var(--d-accent);
+}
+
+.empty {
+  font-size: 2vw;
+  color: var(--d-muted);
+}
+
+/* Menu des écrans */
+.display-menu .screen-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  margin-top: 4vh;
+}
+
+.display-menu .screen-links a {
+  display: block;
+  padding: 3vh 3vw;
+  background: var(--d-panel);
+  border: 1px solid var(--d-border);
+  border-radius: 1vw;
+  color: var(--d-text);
+  text-decoration: none;
+  font-size: 3vw;
+  font-weight: 700;
+}
+
+.display-menu .screen-links a:hover {
+  border-color: var(--d-accent);
+}

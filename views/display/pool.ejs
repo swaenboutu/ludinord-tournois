@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Rafraîchissement auto pour refléter les scores en direct -->
+  <meta http-equiv="refresh" content="15">
+  <title><%= tournament.name %> — Phase de poule</title>
+  <link rel="stylesheet" href="/css/display.css">
+</head>
+<body class="display">
+  <header class="display-header">
+    <h1><%= tournament.name %></h1>
+    <span class="display-phase">Phase de poule</span>
+  </header>
+
+  <% if (finished) { %>
+    <section class="finished-banner">🏆 Phase de poule terminée</section>
+  <% } else if (current) { %>
+    <section class="now-next">
+      <div class="game-card current">
+        <span class="game-label">Jeu en cours</span>
+        <span class="game-name"><%= current.game_name %></span>
+      </div>
+      <div class="game-card next">
+        <span class="game-label">Jeu suivant</span>
+        <span class="game-name"><%= next ? next.game_name : '—' %></span>
+      </div>
+    </section>
+  <% } %>
+
+  <section class="standings">
+    <h2>Classement</h2>
+    <% if (standings.length === 0) { %>
+      <p class="empty">Aucune équipe.</p>
+    <% } else { %>
+      <ul class="standings-list">
+        <% var rank = 0; var prevTotal = null; %>
+        <% standings.forEach(function (s, i) { %>
+          <% if (prevTotal === null || s.total !== prevTotal) { rank = i + 1; prevTotal = s.total; } %>
+          <% var label = (s.name && s.name.trim() !== '') ? s.name : s.pseudos; %>
+          <li>
+            <span class="rank"><%= rank %></span>
+            <span class="swatch" style="background: <%= s.color %>"></span>
+            <span class="team"><%= label %></span>
+            <span class="pts"><%= s.total %></span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </section>
+</body>
+</html>
