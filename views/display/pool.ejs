@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Rafraîchissement auto pour refléter les scores en direct -->
-  <meta http-equiv="refresh" content="15">
   <title><%= tournament.name %> — Phase de poule</title>
   <link rel="stylesheet" href="/css/display.css">
 </head>
 <body class="display">
   <header class="display-header">
-    <h1><%= tournament.name %></h1>
+    <div class="display-brand">
+      <img class="display-logo" src="/images/ludinord-logo.svg" alt="LudiNord">
+      <h1><%= tournament.name %></h1>
+    </div>
     <span class="display-phase">Phase de poule</span>
   </header>
 
@@ -34,7 +35,7 @@
     <% if (standings.length === 0) { %>
       <p class="empty">Aucune équipe.</p>
     <% } else { %>
-      <ul class="standings-list">
+      <ul class="standings-list" data-autoscroll>
         <% var rank = 0; var prevTotal = null; %>
         <% standings.forEach(function (s, i) { %>
           <% if (prevTotal === null || s.total !== prevTotal) { rank = i + 1; prevTotal = s.total; } %>
@@ -49,5 +50,8 @@
       </ul>
     <% } %>
   </section>
+
+  <!-- Défilement auto de la zone classement + rafraîchissement des données -->
+  <script src="/js/display-scroll.js" defer></script>
 </body>
 </html>

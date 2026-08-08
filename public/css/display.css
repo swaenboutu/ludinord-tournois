@@ -1,11 +1,12 @@
 /* ===== Écrans d'affichage TV : sombre, gros contrastes, plein écran ===== */
 :root {
-  --d-bg: #0f1115;
-  --d-panel: #1b1f27;
-  --d-border: #2c313c;
-  --d-text: #f3f5f8;
-  --d-muted: #9aa4b2;
-  --d-accent: #ffd23f;
+  --d-bg: rgb(0, 91, 146); /* fond principal */
+  --d-panel: rgb(0, 72, 116); /* cartes et lignes (nuance plus foncée) */
+  --d-panel-strong: rgb(0, 110, 176); /* zone mise en avant (jeu en cours) */
+  --d-border: rgb(0, 125, 196); /* bordures (nuance plus claire) */
+  --d-text: #f4f8fb;
+  --d-muted: #bcd4e6; /* texte secondaire, bleuté clair */
+  --d-accent: rgb(255, 210, 0); /* jaune, fort contraste sur le bleu */
 }
 
 * {
@@ -18,22 +19,43 @@ body {
   height: 100%;
 }
 
+/* Colonne pleine hauteur : le haut reste fixe, seul le classement défile */
 body.display {
-  min-height: 100vh;
+  height: 100vh;
   padding: 2vw 3vw;
   background: var(--d-bg);
   color: var(--d-text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* En-tête : nom du tournoi + phase */
 .display-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  gap: 1.5vw;
   border-bottom: 2px solid var(--d-border);
   padding-bottom: 1.2vh;
   margin-bottom: 2.5vh;
+}
+
+/* Logo + nom du tournoi, groupés à gauche */
+.display-brand {
+  display: flex;
+  align-items: center;
+  gap: 1.2vw;
+}
+
+/* Logo sur pastille blanche pour rester lisible sur le fond bleu */
+.display-logo {
+  height: 4.5vw;
+  width: auto;
+  padding: 0.5vw 0.8vw;
+  background: #ffffff;
+  border-radius: 0.6vw;
 }
 
 .display-header h1 {
@@ -67,6 +89,7 @@ body.display {
 }
 
 .game-card.current {
+  background: var(--d-panel-strong);
   border-color: var(--d-accent);
 }
 
@@ -101,13 +124,23 @@ body.display {
   color: var(--d-accent);
 }
 
-/* Classement */
+/* Classement : occupe la hauteur restante ; seule la liste défile */
+.standings {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .standings h2 {
   margin: 0 0 1.5vh;
   font-size: 2.4vw;
 }
 
 .standings-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   list-style: none;
   margin: 0;
   padding: 0;
