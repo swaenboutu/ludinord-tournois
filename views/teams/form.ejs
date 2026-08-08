@@ -4,6 +4,19 @@
 
 <h1><%= title %></h1>
 
+<% if (typeof standing !== 'undefined' && standing) { %>
+  <section class="team-summary">
+    <h2>Points</h2>
+    <ul>
+      <% standing.players.forEach(function (pl) { %>
+        <li><%= pl.pseudo %> <span class="muted">(solo)</span> : <%= pl.points %> pts</li>
+      <% }); %>
+      <li>Jeux en équipe : <%= standing.team_points %> pts</li>
+      <li class="team-total"><strong>Total : <%= standing.total %> pts</strong></li>
+    </ul>
+  </section>
+<% } %>
+
 <% if (errors.length > 0) { %>
   <ul class="error">
     <% errors.forEach(function (err) { %>

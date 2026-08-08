@@ -1,0 +1,45 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/pool">← Phase de poule</a></p>
+
+<h1>Classement de la poule</h1>
+<p class="hint">Total = points des jeux en équipe + somme des points des 2 joueurs en jeux solo.</p>
+
+<% if (standings.length === 0) { %>
+  <p>Aucune équipe pour le moment.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Rang</th>
+        <th>Équipe</th>
+        <th>Pts équipe</th>
+        <th>Pts solo</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%
+        // Rang de compétition : même total => même rang, le rang suivant est sauté
+        var rank = 0;
+        var prevTotal = null;
+      %>
+      <% standings.forEach(function (s, i) { %>
+        <% if (prevTotal === null || s.total !== prevTotal) { rank = i + 1; prevTotal = s.total; } %>
+        <% var label = (s.name && s.name.trim() !== '') ? s.name : s.pseudos; %>
+        <tr>
+          <td><%= rank %></td>
+          <td>
+            <span class="color-swatch" style="background: <%= s.color %>"></span>
+            <%= label %>
+          </td>
+          <td><%= s.team_points %></td>
+          <td><%= s.solo_points %></td>
+          <td><strong><%= s.total %></strong></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('../partials/footer') %>

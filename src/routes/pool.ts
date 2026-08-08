@@ -9,7 +9,14 @@ import {
   removePoolRound,
   movePoolRound,
 } from '../repositories/poolRoundRepository';
-import { drawRound, clearRound, listPartiesForRound } from '../repositories/partyRepository';
+import {
+  drawRound,
+  clearRound,
+  listPartiesForRound,
+  savePartyResults,
+  RankInput,
+} from '../repositories/partyRepository';
+import { listPoolStandings } from '../repositories/standingsRepository';
 import { asyncHandler } from '../utils/asyncHandler';
 
 // mergeParams : rend req.params.tournamentId (du chemin de montage) accessible ici
@@ -36,6 +43,16 @@ poolRouter.get(
     const rounds = await listPoolRounds(tournamentId);
     const eligibleGames = await listEligibleGames(tournamentId);
     res.render('pool/index', { title: 'Phase de poule', rounds, eligibleGames });
+  }),
+);
+
+// Classement de la poule (cumul des points par équipe)
+poolRouter.get(
+  '/standings',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    const standings = await listPoolStandings(tournamentId);
+    res.render('pool/standings', { title: 'Classement de la poule', standings });
   }),
 );
 
@@ -109,6 +126,58 @@ poolRouter.get(
     const rounds = await listPoolRounds(tournamentId);
     const position = rounds.findIndex((r) => r.id === roundId) + 1;
     const parties = await listPartiesForRound(tournamentId, roundId);
-    res.render('pool/parties', { title: round.game_name, round, position, parties });
+    res.render('pool/parties', { title: round.game_name, round, position, parties, error: null });
+  }),
+);
+
+// Saisie des places d'une partie -> calcul et enregistrement des points
+poolRouter.post(
+  '/parties/:partyId/results',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    const partyId = Number(req.params.partyId);
+    const roundId = Number(req.body.round_id);
+    const partiesUrl = `/tournaments/${tournamentId}/pool/rounds/${roundId}/parties`;
+
+    // Champs de places : name="rank_<resultId>" ; toutes obligatoires, entiers >= 1
+    const body = req.body as Record<string, unknown>;
+    const ranks: RankInput[] = [];
+    let invalid = false;
+    for (const key of Object.keys(body)) {
+      if (!key.startsWith('rank_')) {
+        continue;
+      }
+      const resultId = Number(key.slice('rank_'.length));
+      const raw = String(body[key] ?? '').trim();
+      const value = Number(raw);
+      if (!Number.isInteger(resultId) || raw === '' || !Number.isInteger(value) || value < 1) {
+        invalid = true;
+      } else {
+        ranks.push({ resultId, rank: value });
+      }
+    }
+
+    const saved = invalid ? false : await savePartyResults(tournamentId, partyId, ranks);
+    if (saved) {
+      res.redirect(partiesUrl);
+      return;
+    }
+
+    // Échec : on réaffiche la manche avec un message (les places ne sont pas enregistrées)
+    const round = await getPoolRound(tournamentId, roundId);
+    if (round === null) {
+      res.redirect(`/tournaments/${tournamentId}/pool`);
+      return;
+    }
+    const rounds = await listPoolRounds(tournamentId);
+    const position = rounds.findIndex((r) => r.id === roundId) + 1;
+    const parties = await listPartiesForRound(tournamentId, roundId);
+    res.status(400).render('pool/parties', {
+      title: round.game_name,
+      round,
+      position,
+      parties,
+      error: 'Indique une place (entier ≥ 1) pour chaque participant de la table.',
+    });
   }),
 );

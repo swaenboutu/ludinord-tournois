@@ -10,6 +10,7 @@ import {
   suggestColor,
   TeamInput,
 } from '../repositories/teamRepository';
+import { getTeamStanding } from '../repositories/standingsRepository';
 import { asyncHandler } from '../utils/asyncHandler';
 
 // mergeParams : rend req.params.tournamentId (du chemin de montage) accessible ici
@@ -104,6 +105,7 @@ teamsRouter.get(
       formAction: `/tournaments/${tournamentId}/teams`,
       values: { ...emptyValues, color: await suggestColor(tournamentId) },
       errors: [],
+      standing: null,
     });
   }),
 );
@@ -120,6 +122,7 @@ teamsRouter.post(
         formAction: `/tournaments/${tournamentId}/teams`,
         values: rebuildValues(req.body),
         errors,
+        standing: null,
       });
       return;
     }
@@ -138,9 +141,11 @@ teamsRouter.get(
       res.status(404).send('Équipe introuvable');
       return;
     }
+    const standing = await getTeamStanding(tournamentId, team.id);
     res.render('teams/form', {
       title: "Modifier l'équipe",
       formAction: `/tournaments/${tournamentId}/teams/${team.id}`,
+      standing,
       values: {
         name: team.name ?? '',
         color: team.color,
@@ -167,6 +172,7 @@ teamsRouter.post(
         formAction: `/tournaments/${tournamentId}/teams/${teamId}`,
         values: rebuildValues(req.body),
         errors,
+        standing: null,
       });
       return;
     }

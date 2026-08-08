@@ -16,6 +16,7 @@
         <th>Équipe</th>
         <th>Joueurs</th>
         <th>Contacts</th>
+        <th>Total</th>
         <th></th>
       </tr>
     </thead>
@@ -41,6 +42,7 @@
                  .map(function (p) { return p.pseudo + ' : ' + p.contact; }); %>
             <%= contacts.length > 0 ? contacts.join(', ') : '—' %>
           </td>
+          <td><strong><%= team.total_points %></strong> pts</td>
           <td class="row-actions">
             <a href="/tournaments/<%= tournament.id %>/teams/<%= team.id %>/edit">Modifier</a>
             <form method="post" action="/tournaments/<%= tournament.id %>/teams/<%= team.id %>/delete"

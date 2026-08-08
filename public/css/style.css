@@ -184,7 +184,7 @@ button:disabled {
 /* ===== Tables tirées (parties) ===== */
 .party-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -207,11 +207,122 @@ button:disabled {
   padding: 0;
 }
 
+/* Ligne participant : nom (avec pastille) au-dessus, place + points en dessous */
 .participant-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.participant-list li:last-child {
+  border-bottom: none;
+}
+
+/* En-tête : pastille + nom */
+.participant-head {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* Nom du participant : s'enroule si trop long */
+.participant-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: bold;
+}
+
+/* Contrôles sous le nom : champ de place à gauche, points à droite */
+.participant-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+/* Libellé "Place" au-dessus de son champ */
+.rank-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  color: #555555;
+}
+
+/* Champ de saisie de la place (petit, non pleine largeur) */
+.rank-input {
+  width: 4rem;
+  margin-top: 0;
+  padding: 0.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.points {
+  min-width: 3.5rem;
+  text-align: right;
+  color: var(--color-accent);
+  font-weight: bold;
+}
+
+/* Marge sous le bouton de validation d'une table */
+.party-card button {
+  margin-top: 0.8rem;
+  width: 100%;
+}
+
+/* Badge "validée" à côté du titre de table */
+.badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #109618;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+.hint {
+  color: #555555;
+  font-size: 0.9rem;
+}
+
+/* Résumé des points sur la page d'une équipe */
+.team-summary {
+  margin-bottom: 1.5rem;
+  padding: 0.8rem 1rem;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.team-summary h2 {
+  margin-top: 0;
+}
+
+.team-summary ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.team-summary li {
   padding: 0.25rem 0;
+}
+
+.team-summary .team-total {
+  margin-top: 0.4rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.4rem;
+}
+
+.muted {
+  color: #777777;
+  font-size: 0.9rem;
 }
 
 /* ===== Hub de configuration ===== */

@@ -16,6 +16,7 @@ export interface Team {
   name: string | null;
   color: string;
   players: Player[]; // toujours 2 (contrainte gérée côté app)
+  total_points: number; // points jeux en équipe + points solo des 2 joueurs
 }
 
 // Données d'un joueur saisies dans le formulaire
@@ -48,11 +49,19 @@ interface TeamPlayerRow extends RowDataPacket {
   player_id: number | null;
   pseudo: string | null;
   contact: string | null;
+  total_points: number;
 }
 
+// total_points = points des jeux en équipe (portés par l'équipe)
+//              + points solo cumulés de ses joueurs
 const SELECT_TEAMS =
   `SELECT t.id, t.tournament_id, t.name, t.color,
-          p.id AS player_id, p.pseudo, p.contact
+          p.id AS player_id, p.pseudo, p.contact,
+          COALESCE((SELECT SUM(points) FROM party_results WHERE team_id = t.id), 0)
+          + COALESCE((SELECT SUM(pr.points)
+                        FROM party_results pr
+                        JOIN team_players tp2 ON tp2.player_id = pr.player_id
+                       WHERE tp2.team_id = t.id), 0) AS total_points
      FROM teams t
      LEFT JOIN team_players tp ON tp.team_id = t.id
      LEFT JOIN players p       ON p.id = tp.player_id`;
@@ -69,6 +78,7 @@ function groupTeams(rows: TeamPlayerRow[]): Team[] {
         name: row.name,
         color: row.color,
         players: [],
+        total_points: Number(row.total_points),
       };
       teams.set(row.id, team);
     }
@@ -82,7 +92,8 @@ function groupTeams(rows: TeamPlayerRow[]): Team[] {
 // Liste les équipes d'un tournoi avec leurs joueurs, triées par nom puis id
 export async function listTeams(tournamentId: number): Promise<Team[]> {
   const [rows] = await pool.execute<TeamPlayerRow[]>(
-    `${SELECT_TEAMS} WHERE t.tournament_id = ? ORDER BY t.name IS NULL, t.name, t.id, p.id`,
+    `${SELECT_TEAMS} WHERE t.tournament_id = ?
+      ORDER BY total_points DESC, t.name IS NULL, t.name, t.id, p.id`,
     [tournamentId],
   );
   return groupTeams(rows);
