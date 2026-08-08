@@ -25,6 +25,11 @@ body {
   padding: 0 1rem;
 }
 
+/* Pages qui exploitent toute la largeur (ex. tables de la manche) */
+.container-wide {
+  max-width: none;
+}
+
 h1 {
   color: var(--color-accent);
 }
@@ -331,6 +336,18 @@ button:disabled {
 .party-card button {
   margin-top: 0.8rem;
   width: 100%;
+}
+
+/* Message de retour après soumission AJAX d'une table */
+.card-flash {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #0a7a28;
+}
+
+.card-flash.is-error {
+  color: var(--color-error);
 }
 
 /* Badge "validée" à côté du titre de table */

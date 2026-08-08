@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
 import { listTeams } from '../repositories/teamRepository';
-import { RankInput } from '../repositories/partyRepository';
 import {
   START_SIZES,
   createFinalPhase,
@@ -24,6 +23,7 @@ import {
   advanceStage,
 } from '../repositories/finalRepository';
 import { loadTournament } from '../middleware/loadTournament';
+import { parseRankInputs } from '../utils/rankForm';
 import { asyncHandler } from '../utils/asyncHandler';
 
 // mergeParams : rend req.params.tournamentId (du chemin de montage) accessible ici
@@ -215,28 +215,23 @@ finalRouter.post(
     const tournamentId = Number(req.params.tournamentId);
     const partyId = Number(req.params.partyId);
     const roundId = Number(req.body.round_id);
-    const partiesUrl = `/tournaments/${tournamentId}/final/rounds/${roundId}/parties`;
 
-    const body = req.body as Record<string, unknown>;
-    const ranks: RankInput[] = [];
-    let invalid = false;
-    for (const key of Object.keys(body)) {
-      if (!key.startsWith('rank_')) {
-        continue;
-      }
-      const resultId = Number(key.slice('rank_'.length));
-      const raw = String(body[key] ?? '').trim();
-      const value = Number(raw);
-      if (!Number.isInteger(resultId) || raw === '' || !Number.isInteger(value) || value < 1) {
-        invalid = true;
+    const { ranks, invalid } = parseRankInputs(req.body as Record<string, unknown>);
+    const scored = invalid ? null : await saveFinalPartyResults(tournamentId, partyId, ranks);
+
+    // Soumission AJAX : réponse JSON, sans rechargement de la page
+    if (req.xhr) {
+      if (scored === null) {
+        res.status(400).json({ ok: false, error: 'Places invalides.' });
       } else {
-        ranks.push({ resultId, rank: value });
+        res.json({ ok: true, results: scored, status: 'validated' });
       }
+      return;
     }
 
-    const saved = invalid ? false : await saveFinalPartyResults(tournamentId, partyId, ranks);
-    if (saved) {
-      res.redirect(partiesUrl);
+    // Repli sans JS : redirection si OK
+    if (scored !== null) {
+      res.redirect(`/tournaments/${tournamentId}/final/rounds/${roundId}/parties`);
       return;
     }
 

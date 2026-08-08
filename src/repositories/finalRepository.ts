@@ -6,6 +6,7 @@ import {
   Party,
   PartyParticipant,
   RankInput,
+  ScoredResult,
   competitionScores,
   shuffle,
   splitBalanced,
@@ -544,11 +545,12 @@ export async function listFinalPartiesForRound(
 }
 
 // Enregistre les places d'une table d'étape et calcule les points (même barème que la poule).
+// Renvoie les scores calculés, ou null si la table n'appartient pas au tournoi / places incomplètes.
 export async function saveFinalPartyResults(
   tournamentId: number,
   partyId: number,
   ranks: RankInput[],
-): Promise<boolean> {
+): Promise<ScoredResult[] | null> {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
@@ -563,16 +565,17 @@ export async function saveFinalPartyResults(
     );
     if (rows.length === 0) {
       await connection.rollback();
-      return false;
+      return null;
     }
     const validIds = new Set(rows.map((r) => r.id as number));
     const filtered = ranks.filter((r) => validIds.has(r.resultId));
     const uniqueIds = new Set(filtered.map((r) => r.resultId));
     if (uniqueIds.size !== validIds.size) {
       await connection.rollback();
-      return false;
+      return null;
     }
-    for (const scored of competitionScores(filtered)) {
+    const scores = competitionScores(filtered);
+    for (const scored of scores) {
       await connection.execute(
         'UPDATE final_party_results SET finish_rank = ?, points = ? WHERE id = ?',
         [scored.finishRank, scored.points, scored.resultId],
@@ -580,7 +583,7 @@ export async function saveFinalPartyResults(
     }
     await connection.execute("UPDATE final_parties SET status = 'validated' WHERE id = ?", [partyId]);
     await connection.commit();
-    return true;
+    return scores;
   } catch (error) {
     await connection.rollback();
     throw error;

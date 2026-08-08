@@ -350,12 +350,13 @@ export async function listPartiesForRound(
 // Enregistre les places d'une partie et calcule les points de chaque participant.
 // Barème : points = N − (nb de participants strictement mieux classés), N = nb de participants.
 // Les ex æquo (même place saisie) reçoivent les mêmes points, le rang suivant est sauté.
-// Renvoie false si la partie n'appartient pas au tournoi ou si toutes les places ne sont pas fournies.
+// Renvoie les scores calculés, ou null si la partie n'appartient pas au tournoi
+// ou si toutes les places ne sont pas fournies.
 export async function savePartyResults(
   tournamentId: number,
   partyId: number,
   ranks: RankInput[],
-): Promise<boolean> {
+): Promise<ScoredResult[] | null> {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
@@ -371,7 +372,7 @@ export async function savePartyResults(
     );
     if (rows.length === 0) {
       await connection.rollback();
-      return false;
+      return null;
     }
 
     const validIds = new Set(rows.map((r) => r.id as number));
@@ -380,10 +381,11 @@ export async function savePartyResults(
     const uniqueIds = new Set(filtered.map((r) => r.resultId));
     if (uniqueIds.size !== validIds.size) {
       await connection.rollback();
-      return false;
+      return null;
     }
 
-    for (const scored of competitionScores(filtered)) {
+    const scores = competitionScores(filtered);
+    for (const scored of scores) {
       await connection.execute(
         'UPDATE party_results SET finish_rank = ?, points = ? WHERE id = ?',
         [scored.finishRank, scored.points, scored.resultId],
@@ -393,7 +395,7 @@ export async function savePartyResults(
     await connection.execute("UPDATE parties SET status = 'validated' WHERE id = ?", [partyId]);
 
     await connection.commit();
-    return true;
+    return scores;
   } catch (error) {
     await connection.rollback();
     throw error;
