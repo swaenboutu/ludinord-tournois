@@ -8,6 +8,7 @@ import {
   createGames,
   updateGame,
   deleteGame,
+  deleteAllGames,
   GameInput,
   GameAvailability,
 } from '../repositories/gameRepository';
@@ -157,6 +158,16 @@ gamesRouter.post(
   asyncHandler(async (req, res) => {
     const tournamentId = Number(req.params.tournamentId);
     await handleCsvImport(res, String(req.body.csv ?? ''), gamesImportConfig(tournamentId));
+  }),
+);
+
+// Vide la liste des jeux — avant les routes ':gameId'
+gamesRouter.post(
+  '/clear',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    await deleteAllGames(tournamentId);
+    res.redirect(`/tournaments/${tournamentId}/games`);
   }),
 );
 

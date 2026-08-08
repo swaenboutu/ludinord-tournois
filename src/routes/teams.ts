@@ -8,6 +8,7 @@ import {
   createTeams,
   updateTeam,
   deleteTeam,
+  deleteAllTeams,
   suggestColor,
   TeamInput,
   BulkTeamInput,
@@ -139,6 +140,16 @@ teamsRouter.post(
   asyncHandler(async (req, res) => {
     const tournamentId = Number(req.params.tournamentId);
     await handleCsvImport(res, String(req.body.csv ?? ''), teamsImportConfig(tournamentId));
+  }),
+);
+
+// Vide la liste des équipes (et leurs joueurs) — avant les routes ':teamId'
+teamsRouter.post(
+  '/clear',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    await deleteAllTeams(tournamentId);
+    res.redirect(`/tournaments/${tournamentId}/teams`);
   }),
 );
 

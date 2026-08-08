@@ -50,6 +50,14 @@
       <% }); %>
     </tbody>
   </table>
+
+  <div class="list-danger">
+    <%- include('../partials/clear-list-button', {
+      action: `/tournaments/${tournament.id}/teams/clear`,
+      label: 'Vider la liste',
+      confirm: 'Vider toute la liste des équipes et leurs joueurs ? Cette action est irréversible.',
+    }) %>
+  </div>
 <% } %>
 
 <%- include('../partials/footer') %>

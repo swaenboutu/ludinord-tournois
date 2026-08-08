@@ -134,6 +134,11 @@ label.checkbox input {
   font-weight: bold;
 }
 
+/* Bouton "vider la liste" détaché sous un tableau */
+.list-danger {
+  margin-top: 1.5rem;
+}
+
 /* Zone de texte (import CSV) */
 textarea {
   display: block;
@@ -405,12 +410,118 @@ tr.qualified {
   background: #eaf7ea;
 }
 
-/* ===== Hub de configuration ===== */
-.config-links {
-  list-style: none;
-  padding: 0;
+/* ===== Page tournoi : en-tête (nom + statut) ===== */
+.tournament-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0 0.5rem;
 }
 
-.config-links li {
-  padding: 0.4rem 0;
+.tournament-name {
+  margin: 0;
+  font-size: 2.4rem;
+  line-height: 1.1;
+}
+
+/* Badge de statut bien visible (pastille + libellé) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge .status-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-open {
+  background: #e6f6ea;
+  color: #0a7a28;
+  border: 1px solid #0a7a28;
+}
+
+.status-closed {
+  background: #eceff3;
+  color: #667085;
+  border: 1px solid #b6bfca;
+}
+
+/* ===== Page tournoi : hub ===== */
+/* Affichages TV : boutons foncés (évoquent l'écran), en haut de page */
+.tv-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 1.2rem 0 2rem;
+}
+
+.tv-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: #0f1115;
+  border: 1px solid #0f1115;
+  border-radius: 6px;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.tv-button:hover {
+  opacity: 0.9;
+}
+
+.section-hint {
+  margin-top: -0.4rem;
+  color: #666666;
+  font-size: 0.9rem;
+}
+
+/* Cartes de navigation (éléments globaux, phases) */
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.hub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.1rem 1.2rem;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent);
+  border-radius: 6px;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.hub-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.hub-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.hub-desc {
+  color: #666666;
+  font-size: 0.9rem;
 }

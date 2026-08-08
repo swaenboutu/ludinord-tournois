@@ -357,3 +357,26 @@ export async function deleteTeam(tournamentId: number, teamId: number): Promise<
     connection.release();
   }
 }
+
+// Vide la liste : supprime toutes les équipes du tournoi ET leurs joueurs.
+export async function deleteAllTeams(tournamentId: number): Promise<void> {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    // Joueurs rattachés au tournoi via leurs équipes (avant de supprimer les équipes)
+    await connection.execute(
+      `DELETE p FROM players p
+         JOIN team_players tp ON tp.player_id = p.id
+         JOIN teams t ON t.id = tp.team_id
+        WHERE t.tournament_id = ?`,
+      [tournamentId],
+    );
+    await connection.execute('DELETE FROM teams WHERE tournament_id = ?', [tournamentId]);
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}

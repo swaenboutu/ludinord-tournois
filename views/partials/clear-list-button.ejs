@@ -1,0 +1,8 @@
+<%
+  // Bouton de suppression totale d'une liste. Locals : action, label, confirm.
+  // Le message `confirm` ne doit pas contenir d'apostrophe (JS inline).
+%>
+<form method="post" action="<%= action %>" class="clear-form"
+      onsubmit="return confirm('<%= confirm %>');">
+  <button type="submit" class="button-danger"><%= label %></button>
+</form>

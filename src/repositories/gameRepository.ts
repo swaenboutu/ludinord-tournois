@@ -128,6 +128,11 @@ export async function deleteGame(tournamentId: number, gameId: number): Promise<
   await pool.execute('DELETE FROM games WHERE id = ? AND tournament_id = ?', [gameId, tournamentId]);
 }
 
+// Vide la liste : supprime tous les jeux du tournoi.
+export async function deleteAllGames(tournamentId: number): Promise<void> {
+  await pool.execute('DELETE FROM games WHERE tournament_id = ?', [tournamentId]);
+}
+
 // Crée plusieurs jeux en une seule transaction (tout ou rien). Renvoie le nombre créé.
 export async function createGames(tournamentId: number, inputs: GameInput[]): Promise<number> {
   if (inputs.length === 0) {
