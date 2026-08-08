@@ -325,6 +325,31 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+/* Puces d'équipes qualifiées (page d'étape) */
+.team-chips {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.team-chips li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+/* Ligne d'équipe qualifiée dans le classement d'étape */
+tr.qualified {
+  background: #eaf7ea;
+}
+
 /* ===== Hub de configuration ===== */
 .config-links {
   list-style: none;

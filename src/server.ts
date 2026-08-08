@@ -8,6 +8,7 @@ import { tournamentsRouter } from './routes/tournaments';
 import { gamesRouter } from './routes/games';
 import { teamsRouter } from './routes/teams';
 import { poolRouter } from './routes/pool';
+import { finalRouter } from './routes/final';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/tournaments', tournamentsRouter);
 app.use('/tournaments/:tournamentId/games', gamesRouter);
 app.use('/tournaments/:tournamentId/teams', teamsRouter);
 app.use('/tournaments/:tournamentId/pool', poolRouter);
+app.use('/tournaments/:tournamentId/final', finalRouter);
 
 // Gestion des erreurs (doit rester le dernier middleware)
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

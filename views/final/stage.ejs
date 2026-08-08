@@ -1,0 +1,133 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/final">← Phase finale</a></p>
+
+<h1><%= stage.name %></h1>
+<p><%= stage.team_count %> équipes · la moitié (<%= qualifyCount %>) <%= hasNext ? 'passe à l\'étape suivante' : 'remporte le tournoi' %>.</p>
+
+<h2>Équipes qualifiées</h2>
+<% if (teams.length === 0) { %>
+  <% if (stage.stage_order === 1) { %>
+    <p>Aucune équipe. Qualifie les <%= stage.team_count %> meilleures équipes de la poule.</p>
+    <form method="post" action="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>/qualify"
+          onsubmit="return confirm('Qualifier les meilleures équipes de la poule ? Les tirages de cette étape seront réinitialisés.');">
+      <button type="submit">Qualifier depuis la poule</button>
+    </form>
+  <% } else { %>
+    <p>Les équipes de cette étape seront définies en validant l'étape précédente.</p>
+  <% } %>
+<% } else { %>
+  <ul class="team-chips">
+    <% teams.forEach(function (t) { %>
+      <li>
+        <span class="color-swatch" style="background: <%= t.color %>"></span>
+        <%= (t.name && t.name.trim() !== '') ? t.name : t.pseudos %>
+        <span class="muted">(poule #<%= t.seed %>)</span>
+      </li>
+    <% }); %>
+  </ul>
+  <% if (stage.stage_order === 1) { %>
+    <form method="post" action="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>/qualify"
+          onsubmit="return confirm('Re-qualifier depuis la poule ? Les tirages de cette étape seront réinitialisés.');">
+      <button type="submit">Re-qualifier depuis la poule</button>
+    </form>
+  <% } %>
+<% } %>
+
+<h2>Manches</h2>
+<% if (rounds.length === 0) { %>
+  <p>Aucune manche. Ajoute un jeu ci-dessous.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Jeu</th><th>Type</th><th>Tables</th><th>Ordre</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% rounds.forEach(function (round, i) { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= round.game_name %></td>
+          <td><%= round.is_team_game ? 'Équipe' : 'Solo' %></td>
+          <td><%= round.table_count > 0 ? round.table_count + ' table' + (round.table_count > 1 ? 's' : '') : '—' %></td>
+          <td class="row-actions">
+            <form method="post" action="/tournaments/<%= tournament.id %>/final/rounds/<%= round.id %>/move">
+              <input type="hidden" name="direction" value="up">
+              <button type="submit" <%= i === 0 ? 'disabled' : '' %>>↑</button>
+            </form>
+            <form method="post" action="/tournaments/<%= tournament.id %>/final/rounds/<%= round.id %>/move">
+              <input type="hidden" name="direction" value="down">
+              <button type="submit" <%= i === rounds.length - 1 ? 'disabled' : '' %>>↓</button>
+            </form>
+          </td>
+          <td class="row-actions">
+            <a href="/tournaments/<%= tournament.id %>/final/rounds/<%= round.id %>/parties">
+              <%= round.table_count > 0 ? 'Voir les tables' : 'Tirer les tables' %>
+            </a>
+            <form method="post" action="/tournaments/<%= tournament.id %>/final/rounds/<%= round.id %>/delete"
+                  onsubmit="return confirm('Retirer cette manche ? Les tables tirées seront supprimées.');">
+              <button type="submit" class="button-danger">Retirer</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>
+
+<% if (eligibleGames.length > 0) { %>
+  <form method="post" action="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>/rounds" class="inline-form">
+    <label>
+      Jeu à ajouter
+      <select name="game_id" required>
+        <% eligibleGames.forEach(function (game) { %>
+          <option value="<%= game.id %>"><%= game.name %></option>
+        <% }); %>
+      </select>
+    </label>
+    <button type="submit">Ajouter</button>
+  </form>
+<% } else { %>
+  <p>Tous les jeux de finale sont déjà retenus (ou aucun jeu n'est disponible en finale).</p>
+<% } %>
+
+<h2>Classement de l'étape</h2>
+<% if (standings.length === 0) { %>
+  <p>Aucune équipe dans cette étape.</p>
+<% } else { %>
+  <p class="hint">Points de cette étape uniquement. À égalité, le classement de poule départage.</p>
+  <table>
+    <thead>
+      <tr><th>Rang</th><th>Équipe</th><th>Total</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% var rank = 0; var prevTotal = null; %>
+      <% standings.forEach(function (s, i) { %>
+        <% if (prevTotal === null || s.total !== prevTotal) { rank = i + 1; prevTotal = s.total; } %>
+        <% var label = (s.name && s.name.trim() !== '') ? s.name : s.pseudos; %>
+        <tr class="<%= i < qualifyCount ? 'qualified' : '' %>">
+          <td><%= rank %></td>
+          <td>
+            <span class="color-swatch" style="background: <%= s.color %>"></span>
+            <%= label %>
+          </td>
+          <td><strong><%= s.total %></strong> pts</td>
+          <td>
+            <% if (i < qualifyCount) { %>
+              <span class="badge"><%= hasNext ? 'qualifiée' : 'champion' %></span>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <% if (hasNext) { %>
+    <form method="post" action="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>/advance"
+          style="margin-top:1rem"
+          onsubmit="return confirm('Valider l\'étape et qualifier les <%= qualifyCount %> meilleures pour l\'étape suivante ? L\'étape suivante sera réinitialisée.');">
+      <button type="submit">Valider l'étape → qualifier les <%= qualifyCount %> meilleures</button>
+    </form>
+  <% } %>
+<% } %>
+
+<%- include('../partials/footer') %>

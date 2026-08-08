@@ -1,0 +1,56 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>">← <%= tournament.name %></a></p>
+
+<h1>Phase finale</h1>
+
+<% if (stages.length === 0) { %>
+  <p>La phase finale n'est pas encore configurée.</p>
+  <% if (sizeOptions.length === 0) { %>
+    <p>Il faut au moins 2 équipes dans le tournoi pour lancer une phase finale (actuellement <%= teamCount %>).</p>
+  <% } else { %>
+    <h2>Configurer</h2>
+    <p>Choisis le nombre d'équipes qualifiées au départ. Les étapes suivantes gardent la moitié à chaque tour, jusqu'à la finale.</p>
+    <form method="post" action="/tournaments/<%= tournament.id %>/final" class="inline-form">
+      <label>
+        Équipes qualifiées de la poule
+        <select name="start_size" required>
+          <% sizeOptions.forEach(function (size) { %>
+            <option value="<%= size %>"><%= size %> équipes</option>
+          <% }); %>
+        </select>
+      </label>
+      <button type="submit">Créer la phase finale</button>
+    </form>
+  <% } %>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Étape</th>
+        <th>Équipes</th>
+        <th>Manches</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% stages.forEach(function (stage) { %>
+        <tr>
+          <td><%= stage.stage_order %></td>
+          <td><a href="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>"><%= stage.name %></a></td>
+          <td><%= stage.team_assigned %> / <%= stage.team_count %></td>
+          <td><%= stage.round_count %></td>
+          <td><a href="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>">Ouvrir</a></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <form method="post" action="/tournaments/<%= tournament.id %>/final/reset" style="margin-top:1.5rem"
+        onsubmit="return confirm('Réinitialiser toute la phase finale ? Étapes, tirages et résultats seront supprimés.');">
+    <button type="submit" class="button-danger">Réinitialiser la phase finale</button>
+  </form>
+<% } %>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,73 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>">← <%= stage.name %></a></p>
+
+<h1>Manche <%= position %> — <%= round.game_name %></h1>
+<p>
+  <%= round.is_team_game ? 'Jeu en équipe' : 'Jeu solo' %> ·
+  <%= round.min_players %>–<%= round.max_players %> joueurs par table
+</p>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <ul class="error"><li><%= error %></li></ul>
+<% } %>
+
+<div class="form-actions">
+  <form method="post" action="/tournaments/<%= tournament.id %>/final/rounds/<%= round.id %>/draw"
+        onsubmit="return <%= parties.length > 0 ? "confirm('Relancer le tirage ? La répartition ET les places saisies seront remplacées.')" : 'true' %>;">
+    <button type="submit"><%= parties.length > 0 ? 'Relancer le tirage' : 'Tirer les tables' %></button>
+  </form>
+  <% if (parties.length > 0) { %>
+    <form method="post" action="/tournaments/<%= tournament.id %>/final/rounds/<%= round.id %>/clear"
+          onsubmit="return confirm('Effacer toutes les tables de cette manche ?');">
+      <button type="submit" class="button-danger">Effacer</button>
+    </form>
+  <% } %>
+</div>
+
+<% if (parties.length === 0) { %>
+  <p>Aucune table tirée. Vérifie que les équipes de l'étape sont qualifiées, puis lance le tirage.</p>
+<% } else { %>
+  <p class="hint">Saisis la place de chaque participant (même numéro = ex æquo). Les points sont calculés à la validation.</p>
+  <div class="party-grid">
+    <% parties.forEach(function (party) { %>
+      <form class="party-card" method="post"
+            action="/tournaments/<%= tournament.id %>/final/parties/<%= party.id %>/results">
+        <input type="hidden" name="round_id" value="<%= round.id %>">
+        <h3>
+          Table <%= party.table_number %>
+          <% if (party.status === 'validated') { %><span class="badge">validée</span><% } %>
+        </h3>
+        <ul class="participant-list">
+          <% party.participants.forEach(function (p) { %>
+            <%
+              var isTeam = p.team_id !== null;
+              var color = isTeam ? p.team_color : (p.player_team_color || '#cccccc');
+              var label = isTeam
+                ? ((p.team_name && p.team_name.trim() !== '') ? p.team_name : p.team_pseudos)
+                : p.player_pseudo;
+            %>
+            <li>
+              <div class="participant-head">
+                <span class="color-swatch" style="background: <%= color %>"></span>
+                <span class="participant-name"><%= label %></span>
+              </div>
+              <div class="participant-controls">
+                <label class="rank-label">
+                  Place
+                  <input type="number" class="rank-input" name="rank_<%= p.result_id %>" min="1"
+                         value="<%= p.finish_rank !== null ? p.finish_rank : '' %>"
+                         aria-label="Place de <%= label %>">
+                </label>
+                <span class="points"><%= p.points !== null ? p.points + ' pts' : '' %></span>
+              </div>
+            </li>
+          <% }); %>
+        </ul>
+        <button type="submit">Valider les places</button>
+      </form>
+    <% }); %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

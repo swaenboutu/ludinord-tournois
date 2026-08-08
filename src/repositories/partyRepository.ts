@@ -23,6 +23,27 @@ export interface RankInput {
   rank: number;
 }
 
+// Résultat scoré : rang de compétition + points calculés.
+export interface ScoredResult {
+  resultId: number;
+  finishRank: number;
+  points: number;
+}
+
+// Barème place -> points, partagé poule/finale.
+// points = N − (nb strictement mieux classés) ; ex æquo = mêmes points, rang suivant sauté.
+export function competitionScores(ranks: RankInput[]): ScoredResult[] {
+  const total = ranks.length;
+  return ranks.map((target) => {
+    const strictlyBetter = ranks.filter((other) => other.rank < target.rank).length;
+    return {
+      resultId: target.resultId,
+      finishRank: strictlyBetter + 1,
+      points: total - strictlyBetter,
+    };
+  });
+}
+
 // Une table de jeu tirée pour une manche, avec ses participants.
 export interface Party {
   id: number;
@@ -38,7 +59,7 @@ export interface DrawResult {
 }
 
 // Mélange aléatoire (Fisher-Yates), sans muter le tableau d'entrée.
-function shuffle<T>(items: T[]): T[] {
+export function shuffle<T>(items: T[]): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -48,7 +69,7 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 // Répartit `count` unités en `numTables` tables aussi égales que possible.
-function splitBalanced(count: number, numTables: number): number[] {
+export function splitBalanced(count: number, numTables: number): number[] {
   const base = Math.floor(count / numTables);
   const remainder = count % numTables;
   const sizes: number[] = [];
@@ -60,7 +81,7 @@ function splitBalanced(count: number, numTables: number): number[] {
 
 // Nombre de tables pour un jeu en équipe : assez pour respecter la capacité max,
 // sans descendre sous le minimum tant qu'on peut retirer une table.
-function teamTableCount(count: number, maxPer: number, minPer: number): number {
+export function teamTableCount(count: number, maxPer: number, minPer: number): number {
   let numTables = Math.max(1, Math.ceil(count / maxPer));
   while (numTables > 1 && Math.floor(count / numTables) < minPer) {
     numTables -= 1;
@@ -72,7 +93,7 @@ function teamTableCount(count: number, maxPer: number, minPer: number): number {
 // que deux joueurs d'une même équipe ne se retrouvent jamais à la même table.
 // Chaque équipe place ses joueurs sur des tables distinctes, en visant les plus
 // libres (ex æquo départagés au hasard) pour équilibrer le remplissage.
-function assignSolo(teams: number[][], sizes: number[]): number[][] {
+export function assignSolo(teams: number[][], sizes: number[]): number[][] {
   const remaining = [...sizes];
   const tables: number[][] = sizes.map(() => []);
   const indices = sizes.map((_, i) => i);
@@ -362,14 +383,10 @@ export async function savePartyResults(
       return false;
     }
 
-    const total = validIds.size;
-    for (const target of filtered) {
-      const strictlyBetter = filtered.filter((other) => other.rank < target.rank).length;
-      const competitionRank = strictlyBetter + 1;
-      const points = total - strictlyBetter;
+    for (const scored of competitionScores(filtered)) {
       await connection.execute(
         'UPDATE party_results SET finish_rank = ?, points = ? WHERE id = ?',
-        [competitionRank, points, target.resultId],
+        [scored.finishRank, scored.points, scored.resultId],
       );
     }
 
