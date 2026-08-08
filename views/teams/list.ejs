@@ -4,7 +4,10 @@
 
 <h1>Équipes</h1>
 
-<p><a class="button" href="/tournaments/<%= tournament.id %>/teams/new">+ Nouvelle équipe</a></p>
+<p>
+  <a class="button" href="/tournaments/<%= tournament.id %>/teams/new">+ Nouvelle équipe</a>
+  <a class="button" href="/tournaments/<%= tournament.id %>/teams/import">Importer un CSV</a>
+</p>
 
 <% if (teams.length === 0) { %>
   <p>Aucune équipe pour le moment.</p>

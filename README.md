@@ -11,6 +11,7 @@ finale** à élimination par étapes. Un **affichage télé** public complète l
   lien règles, disponibilité poule / finale / les deux).
 - **Équipes & joueurs** : équipes de 2 joueurs, couleur de pion (suggérée libre),
   contact facultatif visible **admin uniquement**. Liste triée par total de points.
+  **Import CSV** en lot (séparateur `,` ou `;`) avec page d'aide au format.
 - **Phase de poule** :
   - manches ordonnées (sélection des jeux joués et de leur ordre) ;
   - tirage aléatoire des tables (coéquipiers **séparés** en solo, équipe **groupée**

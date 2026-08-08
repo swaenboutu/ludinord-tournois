@@ -5,11 +5,14 @@ import {
   listTeams,
   getTeam,
   createTeam,
+  createTeams,
   updateTeam,
   deleteTeam,
   suggestColor,
   TeamInput,
+  BulkTeamInput,
 } from '../repositories/teamRepository';
+import { parseCsv, detectDelimiter } from '../utils/csv';
 import { getTeamStanding } from '../repositories/standingsRepository';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -110,6 +113,47 @@ teamsRouter.get(
   }),
 );
 
+// Page d'import CSV (défini avant les routes ':teamId' pour ne pas être capturé)
+teamsRouter.get('/import', (req, res) => {
+  res.render('teams/import', {
+    title: 'Importer des équipes (CSV)',
+    csv: '',
+    errors: [],
+    imported: null,
+  });
+});
+
+// Traitement de l'import CSV (tout ou rien : on n'importe que si aucune erreur)
+teamsRouter.post(
+  '/import',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    const csv = String(req.body.csv ?? '');
+    const { inputs, errors } = parseTeamsCsv(csv);
+
+    if (errors.length === 0 && inputs.length === 0) {
+      errors.push('Aucune équipe à importer.');
+    }
+    if (errors.length > 0) {
+      res.status(400).render('teams/import', {
+        title: 'Importer des équipes (CSV)',
+        csv,
+        errors,
+        imported: null,
+      });
+      return;
+    }
+
+    const imported = await createTeams(tournamentId, inputs);
+    res.render('teams/import', {
+      title: 'Importer des équipes (CSV)',
+      csv: '',
+      errors: [],
+      imported,
+    });
+  }),
+);
+
 // Création
 teamsRouter.post(
   '/',
@@ -190,6 +234,89 @@ teamsRouter.post(
     res.redirect(`/tournaments/${tournamentId}/teams`);
   }),
 );
+
+// Mots-clés reconnaissant une ligne d'en-tête (alors ignorée à l'import)
+const CSV_HEADER_TOKENS = [
+  'pseudo',
+  'equipe',
+  'équipe',
+  'team',
+  'joueur',
+  'contact',
+  'couleur',
+  'color',
+  'nom',
+  'name',
+];
+
+// Analyse un CSV d'équipes en entrées prêtes pour createTeams, avec les erreurs par ligne.
+// Colonnes attendues : nom_equipe, pseudo_1, contact_1, pseudo_2, contact_2, couleur
+function parseTeamsCsv(text: string): { inputs: BulkTeamInput[]; errors: string[] } {
+  const errors: string[] = [];
+  const inputs: BulkTeamInput[] = [];
+
+  if (text.trim() === '') {
+    return { inputs, errors };
+  }
+
+  const rows = parseCsv(text, detectDelimiter(text)).filter((r) =>
+    r.some((f) => f.trim() !== ''),
+  );
+  if (rows.length === 0) {
+    return { inputs, errors };
+  }
+
+  // Ignore une éventuelle ligne d'en-tête
+  const first = rows[0].map((f) => f.trim().toLowerCase());
+  const hasHeader = first.some((f) => CSV_HEADER_TOKENS.includes(f));
+  const dataRows = hasHeader ? rows.slice(1) : rows;
+
+  dataRows.forEach((row, index) => {
+    const lineNumber = hasHeader ? index + 2 : index + 1; // n° de ligne dans le fichier
+    const name = (row[0] ?? '').trim();
+    const pseudo1 = (row[1] ?? '').trim();
+    const contact1 = (row[2] ?? '').trim();
+    const pseudo2 = (row[3] ?? '').trim();
+    const contact2 = (row[4] ?? '').trim();
+    const colorRaw = (row[5] ?? '').trim();
+
+    const rowErrors: string[] = [];
+    if (pseudo1 === '') {
+      rowErrors.push('pseudo du joueur 1 manquant');
+    }
+    if (pseudo2 === '') {
+      rowErrors.push('pseudo du joueur 2 manquant');
+    }
+    if (pseudo1 !== '' && pseudo1 === pseudo2) {
+      rowErrors.push('les deux pseudos sont identiques');
+    }
+
+    let color: string | null = null;
+    if (colorRaw !== '') {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(colorRaw)) {
+        rowErrors.push('couleur invalide (attendu #RRGGBB)');
+      } else {
+        color = colorRaw.toUpperCase();
+      }
+    }
+
+    if (rowErrors.length > 0) {
+      errors.push(`Ligne ${lineNumber} : ${rowErrors.join(', ')}.`);
+      return;
+    }
+
+    inputs.push({
+      name: name === '' ? null : name,
+      color,
+      players: [
+        { pseudo: pseudo1, contact: contact1 === '' ? null : contact1 },
+        { pseudo: pseudo2, contact: contact2 === '' ? null : contact2 },
+      ],
+    });
+  });
+
+  return { inputs, errors };
+}
 
 // Reconstruit les valeurs du formulaire depuis le corps brut (pour réafficher après erreur)
 function rebuildValues(body: Record<string, unknown>): typeof emptyValues {

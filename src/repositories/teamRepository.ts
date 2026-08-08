@@ -152,6 +152,79 @@ export async function createTeam(tournamentId: number, input: TeamInput): Promis
   }
 }
 
+// Équipe à créer en lot : couleur facultative (null => auto-attribuée).
+export interface BulkTeamInput {
+  name: string | null;
+  color: string | null;
+  players: [PlayerInput, PlayerInput];
+}
+
+// Crée plusieurs équipes (et leurs joueurs) en une seule transaction.
+// Les couleurs vides sont auto-attribuées depuis la palette, en évitant les doublons.
+// Tout échoue ou tout réussit. Renvoie le nombre d'équipes créées.
+export async function createTeams(
+  tournamentId: number,
+  inputs: BulkTeamInput[],
+): Promise<number> {
+  if (inputs.length === 0) {
+    return 0;
+  }
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // Couleurs déjà prises dans le tournoi (pour l'auto-attribution)
+    const [colorRows] = await connection.execute<RowDataPacket[]>(
+      'SELECT color FROM teams WHERE tournament_id = ?',
+      [tournamentId],
+    );
+    const used = new Set(colorRows.map((r) => String(r.color).toUpperCase()));
+
+    // Renvoie la prochaine couleur libre de la palette (boucle si épuisée)
+    const nextFreeColor = (): string => {
+      const free = COLOR_PALETTE.find((c) => !used.has(c));
+      const color = free ?? COLOR_PALETTE[used.size % COLOR_PALETTE.length];
+      used.add(color);
+      return color;
+    };
+
+    for (const input of inputs) {
+      let color: string;
+      if (input.color) {
+        color = input.color;
+        used.add(color.toUpperCase());
+      } else {
+        color = nextFreeColor();
+      }
+
+      const [teamResult] = await connection.execute<ResultSetHeader>(
+        'INSERT INTO teams (tournament_id, name, color) VALUES (?, ?, ?)',
+        [tournamentId, input.name, color],
+      );
+      const teamId = teamResult.insertId;
+
+      for (const player of input.players) {
+        const [playerResult] = await connection.execute<ResultSetHeader>(
+          'INSERT INTO players (pseudo, contact) VALUES (?, ?)',
+          [player.pseudo, player.contact],
+        );
+        await connection.execute('INSERT INTO team_players (team_id, player_id) VALUES (?, ?)', [
+          teamId,
+          playerResult.insertId,
+        ]);
+      }
+    }
+
+    await connection.commit();
+    return inputs.length;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
 // Met à jour une équipe et ses joueurs (mise en correspondance par position)
 export async function updateTeam(
   tournamentId: number,

@@ -129,6 +129,33 @@ label.checkbox input {
   font-weight: bold;
 }
 
+.success {
+  color: #0a7a28;
+  font-weight: bold;
+}
+
+/* Zone de texte (import CSV) */
+textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.95rem;
+}
+
+/* Exemple de CSV */
+.csv-example {
+  padding: 0.8rem 1rem;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+}
+
 /* Groupe de champs (joueurs d'une équipe) */
 fieldset {
   margin: 0 0 1rem;

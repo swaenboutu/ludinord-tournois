@@ -1,0 +1,72 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/teams">← Équipes</a></p>
+
+<h1>Importer des équipes (CSV)</h1>
+
+<% if (imported !== null) { %>
+  <p class="success"><%= imported %> équipe<%= imported > 1 ? 's' : '' %> importée<%= imported > 1 ? 's' : '' %> avec succès.</p>
+  <p><a class="button" href="/tournaments/<%= tournament.id %>/teams">Voir les équipes</a></p>
+<% } %>
+
+<% if (errors.length > 0) { %>
+  <ul class="error">
+    <% errors.forEach(function (err) { %>
+      <li><%= err %></li>
+    <% }); %>
+  </ul>
+<% } %>
+
+<h2>Format attendu</h2>
+<p>Une ligne par équipe. Colonnes, dans cet ordre :</p>
+<ol>
+  <li><strong>Nom de l'équipe</strong> — facultatif (par défaut : les deux pseudos)</li>
+  <li><strong>Pseudo du joueur 1</strong> — obligatoire</li>
+  <li><strong>Contact du joueur 1</strong> — facultatif (admin uniquement)</li>
+  <li><strong>Pseudo du joueur 2</strong> — obligatoire</li>
+  <li><strong>Contact du joueur 2</strong> — facultatif (admin uniquement)</li>
+  <li><strong>Couleur</strong> — facultative, format <code>#RRGGBB</code> (auto-attribuée si vide)</li>
+</ol>
+<ul>
+  <li>Séparateur <code>,</code> ou <code>;</code> (détecté automatiquement).</li>
+  <li>Une ligne d'en-tête est acceptée et ignorée automatiquement.</li>
+  <li>Les deux pseudos d'une équipe doivent être différents.</li>
+  <li>Import « tout ou rien » : si une ligne est invalide, rien n'est importé.</li>
+</ul>
+
+<h3>Exemple</h3>
+<pre class="csv-example">nom_equipe;pseudo_1;contact_1;pseudo_2;contact_2;couleur
+Les Dés Brouillés;Alice;0600000000;Bob;;#3366CC
+;Chloé;;David;david@mail.fr;
+Team Meeple;Emma;;Farid;;#DC3912</pre>
+
+<h2>Importer</h2>
+<form method="post" action="/tournaments/<%= tournament.id %>/teams/import">
+  <label>
+    Fichier CSV
+    <input type="file" id="csvFile" accept=".csv,text/csv,text/plain">
+  </label>
+  <label>
+    Contenu CSV (rempli automatiquement depuis le fichier, modifiable)
+    <textarea name="csv" id="csvText" rows="10" placeholder="Colle ici le CSV, ou choisis un fichier ci-dessus"><%= csv %></textarea>
+  </label>
+  <div class="form-actions">
+    <button type="submit">Importer</button>
+    <a href="/tournaments/<%= tournament.id %>/teams">Annuler</a>
+  </div>
+</form>
+
+<script>
+  // Lit le fichier choisi et remplit la zone de texte (envoyée avec le formulaire).
+  document.getElementById('csvFile').addEventListener('change', function (event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      document.getElementById('csvText').value = reader.result;
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+</script>
+
+<%- include('../partials/footer') %>
