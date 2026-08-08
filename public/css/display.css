@@ -192,6 +192,76 @@ body.display {
   color: var(--d-muted);
 }
 
+/* ===== Arbre de la phase finale ===== */
+/* Une colonne par étape (première → demi-finale) ; seule la zone défile si trop haute */
+.bracket {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  gap: 1.5vw;
+  align-items: flex-start;
+}
+
+.bracket-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+}
+
+.bracket-stage {
+  margin: 0 0 0.5vh;
+  font-size: 1.9vw;
+  text-align: center;
+  color: var(--d-accent);
+}
+
+.bracket-team {
+  display: flex;
+  align-items: center;
+  gap: 0.8vw;
+  padding: 1vh 1vw;
+  background: var(--d-panel);
+  border: 1px solid var(--d-border);
+  border-radius: 0.6vw;
+  font-size: 1.6vw;
+}
+
+/* Équipe qualifiée pour l'étape suivante : mise en avant */
+.bracket-team.qualified {
+  background: var(--d-panel-strong);
+  border-color: var(--d-accent);
+}
+
+.bracket-team .swatch {
+  width: 1.6vw;
+  height: 1.6vw;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.bracket-team .team {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.bracket-team .pts {
+  font-weight: 800;
+  color: var(--d-accent);
+}
+
+.bracket-empty {
+  color: var(--d-muted);
+  font-size: 1.3vw;
+  text-align: center;
+}
+
 /* Menu des écrans */
 .display-menu .screen-links {
   display: flex;

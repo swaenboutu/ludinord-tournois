@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { listPoolRounds } from '../repositories/poolRoundRepository';
 import { listPoolStandings } from '../repositories/standingsRepository';
+import { listFinalStages, getStageStandings } from '../repositories/finalRepository';
 import { loadTournament } from '../middleware/loadTournament';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -37,5 +38,24 @@ displayRouter.get(
 
     const standings = await listPoolStandings(tournamentId);
     res.render('display/pool', { current, next, standings, finished });
+  }),
+);
+
+// Écran phase finale : arbre des étapes, des premières jusqu'à la demi-finale.
+// La dernière étape (la finale) est exclue — elle aura son propre écran.
+displayRouter.get(
+  '/final',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    const stages = await listFinalStages(tournamentId);
+    const shown = stages.slice(0, -1); // on retire la finale
+
+    const bracket = [];
+    for (const stage of shown) {
+      const standings = await getStageStandings(stage.id);
+      bracket.push({ stage, standings, qualifyCount: Math.floor(stage.team_count / 2) });
+    }
+
+    res.render('display/final', { bracket });
   }),
 );

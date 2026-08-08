@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= tournament.name %> — Phase finale</title>
+  <link rel="stylesheet" href="/css/display.css">
+</head>
+<body class="display">
+  <header class="display-header">
+    <div class="display-brand">
+      <img class="display-logo" src="/images/ludinord-logo.svg" alt="LudiNord">
+      <h1><%= tournament.name %></h1>
+    </div>
+    <span class="display-phase">Phase finale</span>
+  </header>
+
+  <% if (bracket.length === 0) { %>
+    <p class="empty">La phase finale n'est pas encore configurée.</p>
+  <% } else { %>
+    <div class="bracket" data-autoscroll>
+      <% bracket.forEach(function (col) { %>
+        <div class="bracket-col">
+          <h2 class="bracket-stage"><%= col.stage.name %></h2>
+          <% if (col.standings.length === 0) { %>
+            <p class="bracket-empty">En attente de qualification</p>
+          <% } else { %>
+            <% col.standings.forEach(function (s, i) { %>
+              <% var label = (s.name && s.name.trim() !== '') ? s.name : s.pseudos; %>
+              <div class="bracket-team <%= i < col.qualifyCount ? 'qualified' : '' %>">
+                <span class="swatch" style="background: <%= s.color %>"></span>
+                <span class="team"><%= label %></span>
+                <span class="pts"><%= s.total %></span>
+              </div>
+            <% }); %>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <!-- Défilement auto (si l'arbre dépasse) + rafraîchissement des données -->
+  <script src="/js/display-scroll.js" defer></script>
+</body>
+</html>
