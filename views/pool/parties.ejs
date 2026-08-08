@@ -1,0 +1,51 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/pool">← Phase de poule</a></p>
+
+<h1>Manche <%= position %> — <%= round.game_name %></h1>
+<p>
+  <%= round.is_team_game ? 'Jeu en équipe' : 'Jeu solo' %> ·
+  <%= round.min_players %>–<%= round.max_players %> joueurs par table
+</p>
+
+<div class="form-actions">
+  <form method="post" action="/tournaments/<%= tournament.id %>/pool/rounds/<%= round.id %>/draw"
+        onsubmit="return <%= parties.length > 0 ? "confirm('Relancer le tirage ? La répartition actuelle sera remplacée.')" : 'true' %>;">
+    <button type="submit"><%= parties.length > 0 ? 'Relancer le tirage' : 'Tirer les tables' %></button>
+  </form>
+  <% if (parties.length > 0) { %>
+    <form method="post" action="/tournaments/<%= tournament.id %>/pool/rounds/<%= round.id %>/clear"
+          onsubmit="return confirm('Effacer toutes les tables de cette manche ?');">
+      <button type="submit" class="button-danger">Effacer</button>
+    </form>
+  <% } %>
+</div>
+
+<% if (parties.length === 0) { %>
+  <p>Aucune table tirée. Vérifie qu'il y a des équipes dans le tournoi, puis lance le tirage.</p>
+<% } else { %>
+  <div class="party-grid">
+    <% parties.forEach(function (party) { %>
+      <div class="party-card">
+        <h3>Table <%= party.table_number %></h3>
+        <ul class="participant-list">
+          <% party.participants.forEach(function (p) { %>
+            <% if (p.team_id !== null) { %>
+              <li>
+                <span class="color-swatch" style="background: <%= p.team_color %>"></span>
+                <%= (p.team_name && p.team_name.trim() !== '') ? p.team_name : p.team_pseudos %>
+              </li>
+            <% } else { %>
+              <li>
+                <span class="color-swatch" style="background: <%= p.player_team_color || '#cccccc' %>"></span>
+                <%= p.player_pseudo %>
+              </li>
+            <% } %>
+          <% }); %>
+        </ul>
+      </div>
+    <% }); %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,79 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>">← <%= tournament.name %></a></p>
+
+<h1>Phase de poule</h1>
+
+<h2>Manches</h2>
+<p>Ordre de passage des jeux, joué par toutes les équipes de la poule.</p>
+
+<% if (rounds.length === 0) { %>
+  <p>Aucune manche pour le moment. Ajoute un jeu ci-dessous.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Jeu</th>
+        <th>Type</th>
+        <th>Tables</th>
+        <th>Ordre</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% rounds.forEach(function (round, i) { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= round.game_name %></td>
+          <td><%= round.is_team_game ? 'Équipe' : 'Solo' %></td>
+          <td>
+            <% if (round.table_count > 0) { %>
+              <%= round.table_count %> table<%= round.table_count > 1 ? 's' : '' %>
+            <% } else { %>
+              <em>non tiré</em>
+            <% } %>
+          </td>
+          <td class="row-actions">
+            <form method="post" action="/tournaments/<%= tournament.id %>/pool/rounds/<%= round.id %>/move">
+              <input type="hidden" name="direction" value="up">
+              <button type="submit" <%= i === 0 ? 'disabled' : '' %>>↑</button>
+            </form>
+            <form method="post" action="/tournaments/<%= tournament.id %>/pool/rounds/<%= round.id %>/move">
+              <input type="hidden" name="direction" value="down">
+              <button type="submit" <%= i === rounds.length - 1 ? 'disabled' : '' %>>↓</button>
+            </form>
+          </td>
+          <td class="row-actions">
+            <a href="/tournaments/<%= tournament.id %>/pool/rounds/<%= round.id %>/parties">
+              <%= round.table_count > 0 ? 'Voir les tables' : 'Tirer les tables' %>
+            </a>
+            <form method="post" action="/tournaments/<%= tournament.id %>/pool/rounds/<%= round.id %>/delete"
+                  onsubmit="return confirm('Retirer cette manche ? Les tables tirées seront supprimées.');">
+              <button type="submit" class="button-danger">Retirer</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>
+
+<h2>Ajouter une manche</h2>
+<% if (eligibleGames.length === 0) { %>
+  <p>Tous les jeux de poule sont déjà retenus (ou aucun jeu n'est disponible en poule).</p>
+<% } else { %>
+  <form method="post" action="/tournaments/<%= tournament.id %>/pool/rounds" class="inline-form">
+    <label>
+      Jeu à ajouter
+      <select name="game_id" required>
+        <% eligibleGames.forEach(function (game) { %>
+          <option value="<%= game.id %>"><%= game.name %></option>
+        <% }); %>
+      </select>
+    </label>
+    <button type="submit">Ajouter</button>
+  </form>
+<% } %>
+
+<%- include('../partials/footer') %>
