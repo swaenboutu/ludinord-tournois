@@ -1,0 +1,57 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>">← <%= tournament.name %></a></p>
+
+<h1>Équipes</h1>
+
+<p><a class="button" href="/tournaments/<%= tournament.id %>/teams/new">+ Nouvelle équipe</a></p>
+
+<% if (teams.length === 0) { %>
+  <p>Aucune équipe pour le moment.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Couleur</th>
+        <th>Équipe</th>
+        <th>Joueurs</th>
+        <th>Contacts</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% teams.forEach(function (team) { %>
+        <%
+          // Nom d'affichage : le nom saisi, sinon les pseudos concaténés
+          var pseudos = team.players.map(function (p) { return p.pseudo; });
+          var displayName = team.name && team.name.trim() !== ''
+            ? team.name
+            : pseudos.join(' & ');
+        %>
+        <tr>
+          <td>
+            <span class="color-swatch" style="background: <%= team.color %>"
+                  title="<%= team.color %>"></span>
+          </td>
+          <td><%= displayName %></td>
+          <td><%= pseudos.join(', ') %></td>
+          <td>
+            <% var contacts = team.players
+                 .filter(function (p) { return p.contact; })
+                 .map(function (p) { return p.pseudo + ' : ' + p.contact; }); %>
+            <%= contacts.length > 0 ? contacts.join(', ') : '—' %>
+          </td>
+          <td class="row-actions">
+            <a href="/tournaments/<%= tournament.id %>/teams/<%= team.id %>/edit">Modifier</a>
+            <form method="post" action="/tournaments/<%= tournament.id %>/teams/<%= team.id %>/delete"
+                  onsubmit="return confirm('Supprimer cette équipe et ses joueurs ?');">
+              <button type="submit" class="button-danger">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>
+
+<%- include('../partials/footer') %>

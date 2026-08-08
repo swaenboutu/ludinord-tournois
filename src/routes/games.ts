@@ -116,15 +116,18 @@ gamesRouter.get(
 );
 
 // Formulaire de création
-gamesRouter.get('/new', (req, res) => {
-  const tournamentId = Number(req.params.tournamentId);
-  res.render('games/form', {
-    title: 'Nouveau jeu',
-    formAction: `/tournaments/${tournamentId}/games`,
-    values: emptyValues,
-    errors: [],
-  });
-});
+gamesRouter.get(
+  '/new',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    res.render('games/form', {
+      title: 'Nouveau jeu',
+      formAction: `/tournaments/${tournamentId}/games`,
+      values: emptyValues,
+      errors: [],
+    });
+  }),
+);
 
 // Création
 gamesRouter.post(

@@ -1,0 +1,48 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/teams">← Équipes</a></p>
+
+<h1><%= title %></h1>
+
+<% if (errors.length > 0) { %>
+  <ul class="error">
+    <% errors.forEach(function (err) { %>
+      <li><%= err %></li>
+    <% }); %>
+  </ul>
+<% } %>
+
+<form method="post" action="<%= formAction %>">
+  <label>
+    Nom de l'équipe (facultatif)
+    <input type="text" name="name" value="<%= values.name %>" maxlength="80"
+           placeholder="Par défaut : les deux pseudos">
+  </label>
+
+  <label class="color-field">
+    Couleur du pion
+    <input type="color" name="color" value="<%= values.color %>">
+  </label>
+
+  <% for (var i = 0; i < 2; i++) { %>
+    <fieldset>
+      <legend>Joueur <%= i + 1 %></legend>
+      <label>
+        Pseudo
+        <input type="text" name="pseudo" value="<%= values.players[i].pseudo %>"
+               required maxlength="50" <%= i === 0 ? 'autofocus' : '' %>>
+      </label>
+      <label>
+        Contact (facultatif, visible admin uniquement)
+        <input type="text" name="contact" value="<%= values.players[i].contact %>" maxlength="50">
+      </label>
+    </fieldset>
+  <% } %>
+
+  <div class="form-actions">
+    <button type="submit">Enregistrer</button>
+    <a href="/tournaments/<%= tournament.id %>/teams">Annuler</a>
+  </div>
+</form>
+
+<%- include('../partials/footer') %>
