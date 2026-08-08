@@ -1,25 +1,15 @@
 import { Router } from 'express';
 
-import { getTournament } from '../repositories/tournamentRepository';
 import { listPoolRounds } from '../repositories/poolRoundRepository';
 import { listPoolStandings } from '../repositories/standingsRepository';
+import { loadTournament } from '../middleware/loadTournament';
 import { asyncHandler } from '../utils/asyncHandler';
 
 // Écrans d'affichage public (télé) — plein écran, sans navigation admin.
 export const displayRouter = Router({ mergeParams: true });
 
-// Middleware : charge le tournoi parent (404 sinon) et le partage aux vues
-displayRouter.use(
-  asyncHandler(async (req, res, next) => {
-    const tournament = await getTournament(Number(req.params.tournamentId));
-    if (tournament === null) {
-      res.status(404).send('Tournoi introuvable');
-      return;
-    }
-    res.locals.tournament = tournament;
-    next();
-  }),
-);
+// Charge le tournoi parent (404 sinon) et le partage aux vues
+displayRouter.use(loadTournament);
 
 // Accueil des écrans disponibles
 displayRouter.get('/', (_req, res) => {

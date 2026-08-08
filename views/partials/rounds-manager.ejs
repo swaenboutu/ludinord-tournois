@@ -1,0 +1,76 @@
+<%
+  // Gestion des manches d'une phase : tableau ordonné (↑↓, tirer, retirer) + ajout d'un jeu.
+  // Partagé poule / finale. Locals :
+  //   basePath   : préfixe des actions sur une manche (ex. /tournaments/1/pool)
+  //   rounds     : manches ordonnées
+  //   eligibleGames : jeux ajoutables
+  //   addAction  : URL du formulaire d'ajout (diffère selon la phase)
+  //   noGamesHint : message quand aucun jeu n'est ajoutable
+%>
+<% if (rounds.length === 0) { %>
+  <p>Aucune manche pour le moment. Ajoute un jeu ci-dessous.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Jeu</th>
+        <th>Type</th>
+        <th>Tables</th>
+        <th>Ordre</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% rounds.forEach(function (round, i) { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= round.game_name %></td>
+          <td><%= round.is_team_game ? 'Équipe' : 'Solo' %></td>
+          <td>
+            <% if (round.table_count > 0) { %>
+              <%= round.table_count %> table<%= round.table_count > 1 ? 's' : '' %>
+            <% } else { %>
+              <em>non tiré</em>
+            <% } %>
+          </td>
+          <td class="row-actions">
+            <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/move">
+              <input type="hidden" name="direction" value="up">
+              <button type="submit" <%= i === 0 ? 'disabled' : '' %>>↑</button>
+            </form>
+            <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/move">
+              <input type="hidden" name="direction" value="down">
+              <button type="submit" <%= i === rounds.length - 1 ? 'disabled' : '' %>>↓</button>
+            </form>
+          </td>
+          <td class="row-actions">
+            <a href="<%= basePath %>/rounds/<%= round.id %>/parties">
+              <%= round.table_count > 0 ? 'Voir les tables' : 'Tirer les tables' %>
+            </a>
+            <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/delete"
+                  onsubmit="return confirm('Retirer cette manche ? Les tables tirées seront supprimées.');">
+              <button type="submit" class="button-danger">Retirer</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>
+
+<% if (eligibleGames.length > 0) { %>
+  <form method="post" action="<%= addAction %>" class="inline-form">
+    <label>
+      Jeu à ajouter
+      <select name="game_id" required>
+        <% eligibleGames.forEach(function (game) { %>
+          <option value="<%= game.id %>"><%= game.name %></option>
+        <% }); %>
+      </select>
+    </label>
+    <button type="submit">Ajouter</button>
+  </form>
+<% } else { %>
+  <p><%= noGamesHint %></p>
+<% } %>
