@@ -146,6 +146,34 @@ textarea {
   font-size: 0.95rem;
 }
 
+/* Zone de glisser-déposer du fichier CSV */
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 1.5rem 1rem;
+  border: 2px dashed var(--color-border);
+  border-radius: 6px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.drop-zone.dragover {
+  border-color: var(--color-accent);
+  background: #eef3ff;
+}
+
+.drop-zone .drop-hint {
+  margin: 0;
+  color: #555555;
+}
+
+.drop-zone label.button {
+  margin: 0;
+}
+
 /* Exemple de CSV */
 .csv-example {
   padding: 0.8rem 1rem;

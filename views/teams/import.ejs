@@ -29,26 +29,29 @@
 </ol>
 <ul>
   <li>Séparateur <code>,</code> ou <code>;</code> (détecté automatiquement).</li>
-  <li>Une ligne d'en-tête est acceptée et ignorée automatiquement.</li>
   <li>Les deux pseudos d'une équipe doivent être différents.</li>
   <li>Import « tout ou rien » : si une ligne est invalide, rien n'est importé.</li>
 </ul>
 
 <h3>Exemple</h3>
-<pre class="csv-example">nom_equipe;pseudo_1;contact_1;pseudo_2;contact_2;couleur
-Les Dés Brouillés;Alice;0600000000;Bob;;#3366CC
+<pre class="csv-example">Les Dés Brouillés;Alice;0600000000;Bob;;#3366CC
 ;Chloé;;David;david@mail.fr;
 Team Meeple;Emma;;Farid;;#DC3912</pre>
 
 <h2>Importer</h2>
 <form method="post" action="/tournaments/<%= tournament.id %>/teams/import">
-  <label>
-    Fichier CSV
-    <input type="file" id="csvFile" accept=".csv,text/csv,text/plain">
-  </label>
+  <div id="dropZone" class="drop-zone">
+    <p class="drop-hint">Glisse-dépose ton fichier CSV ici</p>
+    <label class="button">
+      Choisir un fichier
+      <input type="file" id="csvFile" accept=".csv,text/csv,text/plain" hidden>
+    </label>
+    <p id="fileName" class="muted"></p>
+  </div>
+
   <label>
     Contenu CSV (rempli automatiquement depuis le fichier, modifiable)
-    <textarea name="csv" id="csvText" rows="10" placeholder="Colle ici le CSV, ou choisis un fichier ci-dessus"><%= csv %></textarea>
+    <textarea name="csv" id="csvText" rows="10" placeholder="Colle ici le CSV, ou dépose / choisis un fichier ci-dessus"><%= csv %></textarea>
   </label>
   <div class="form-actions">
     <button type="submit">Importer</button>
@@ -57,16 +60,47 @@ Team Meeple;Emma;;Farid;;#DC3912</pre>
 </form>
 
 <script>
-  // Lit le fichier choisi et remplit la zone de texte (envoyée avec le formulaire).
-  document.getElementById('csvFile').addEventListener('change', function (event) {
-    var file = event.target.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function () {
-      document.getElementById('csvText').value = reader.result;
-    };
-    reader.readAsText(file, 'UTF-8');
-  });
+  (function () {
+    var dropZone = document.getElementById('dropZone');
+    var fileInput = document.getElementById('csvFile');
+    var textArea = document.getElementById('csvText');
+    var fileName = document.getElementById('fileName');
+
+    // Lit un fichier et remplit la zone de texte (envoyée avec le formulaire).
+    function readFile(file) {
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        textArea.value = reader.result;
+      };
+      reader.readAsText(file, 'UTF-8');
+      fileName.textContent = file.name;
+    }
+
+    fileInput.addEventListener('change', function (event) {
+      readFile(event.target.files[0]);
+    });
+
+    // Empêche le navigateur d'ouvrir le fichier, et gère le retour visuel.
+    ['dragenter', 'dragover'].forEach(function (name) {
+      dropZone.addEventListener(name, function (event) {
+        event.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function (name) {
+      dropZone.addEventListener(name, function (event) {
+        event.preventDefault();
+        dropZone.classList.remove('dragover');
+      });
+    });
+    dropZone.addEventListener('drop', function (event) {
+      var files = event.dataTransfer && event.dataTransfer.files;
+      if (files && files.length > 0) {
+        readFile(files[0]);
+      }
+    });
+  })();
 </script>
 
 <%- include('../partials/footer') %>

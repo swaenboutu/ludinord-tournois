@@ -40,6 +40,57 @@ const COLOR_PALETTE = [
   '#8B0707',
 ];
 
+// Convertit une couleur HSL en hex #RRGGBB (majuscules), pour générer des teintes
+// au-delà de la palette. s et l en pourcentage (0–100), h en degrés (0–360).
+function hslToHex(h: number, s: number, l: number): string {
+  const sn = s / 100;
+  const ln = l / 100;
+  const a = sn * Math.min(ln, 1 - ln);
+  const channel = (n: number): string => {
+    const k = (n + h / 30) % 12;
+    const value = ln - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    return Math.round(255 * value)
+      .toString(16)
+      .padStart(2, '0');
+  };
+  return `#${channel(0)}${channel(8)}${channel(4)}`.toUpperCase();
+}
+
+// Couleur aléatoire mais lisible (saturée, ni trop claire ni trop sombre).
+function randomReadableColor(): string {
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = 55 + Math.floor(Math.random() * 25); // 55–79 %
+  const lightness = 42 + Math.floor(Math.random() * 16); // 42–57 %
+  return hslToHex(hue, saturation, lightness);
+}
+
+// Choisit une couleur NON déjà présente dans `used` (qu'on met à jour) :
+// d'abord une couleur libre de la palette, sinon une couleur générée unique.
+// Garantit l'absence de doublon quel que soit le nombre d'équipes.
+export function pickUniqueColor(used: Set<string>): string {
+  const free = COLOR_PALETTE.find((c) => !used.has(c));
+  if (free) {
+    used.add(free);
+    return free;
+  }
+  for (let attempt = 0; attempt < 1000; attempt += 1) {
+    const color = randomReadableColor();
+    if (!used.has(color)) {
+      used.add(color);
+      return color;
+    }
+  }
+  // Filet ultime (quasi impossible) : balayage de teintes à la recherche d'une libre
+  for (let hue = 0; hue < 360; hue += 1) {
+    const color = hslToHex(hue, 65, 50);
+    if (!used.has(color)) {
+      used.add(color);
+      return color;
+    }
+  }
+  return randomReadableColor();
+}
+
 // Ligne SQL brute d'une équipe jointe à ses joueurs (joueurs à plat)
 interface TeamPlayerRow extends RowDataPacket {
   id: number;
@@ -116,7 +167,7 @@ export async function suggestColor(tournamentId: number): Promise<string> {
     [tournamentId],
   );
   const used = new Set(rows.map((r) => String(r.color).toUpperCase()));
-  return COLOR_PALETTE.find((c) => !used.has(c)) ?? COLOR_PALETTE[0];
+  return pickUniqueColor(used);
 }
 
 // Crée une équipe et ses 2 joueurs dans une transaction ; retourne l'id de l'équipe
@@ -180,21 +231,13 @@ export async function createTeams(
     );
     const used = new Set(colorRows.map((r) => String(r.color).toUpperCase()));
 
-    // Renvoie la prochaine couleur libre de la palette (boucle si épuisée)
-    const nextFreeColor = (): string => {
-      const free = COLOR_PALETTE.find((c) => !used.has(c));
-      const color = free ?? COLOR_PALETTE[used.size % COLOR_PALETTE.length];
-      used.add(color);
-      return color;
-    };
-
     for (const input of inputs) {
       let color: string;
       if (input.color) {
         color = input.color;
         used.add(color.toUpperCase());
       } else {
-        color = nextFreeColor();
+        color = pickUniqueColor(used);
       }
 
       const [teamResult] = await connection.execute<ResultSetHeader>(
