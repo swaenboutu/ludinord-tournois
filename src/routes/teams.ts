@@ -13,6 +13,7 @@ import {
   BulkTeamInput,
 } from '../repositories/teamRepository';
 import { parseCsv, detectDelimiter } from '../utils/csv';
+import { handleCsvImport, renderImportForm, CsvImportConfig } from '../utils/csvImport';
 import { getTeamStanding } from '../repositories/standingsRepository';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -113,44 +114,31 @@ teamsRouter.get(
   }),
 );
 
-// Page d'import CSV (défini avant les routes ':teamId' pour ne pas être capturé)
-teamsRouter.get('/import', (req, res) => {
-  res.render('teams/import', {
+// Config d'import CSV des équipes (parse + création), mutualisée avec le helper générique
+function teamsImportConfig(tournamentId: number): CsvImportConfig<BulkTeamInput> {
+  return {
+    view: 'teams/import',
     title: 'Importer des équipes (CSV)',
-    csv: '',
-    errors: [],
-    imported: null,
-  });
-});
+    emptyMessage: 'Aucune équipe à importer.',
+    parse: parseTeamsCsv,
+    create: (inputs) => createTeams(tournamentId, inputs),
+  };
+}
+
+// Page d'import CSV (définie avant les routes ':teamId' pour ne pas être capturée)
+teamsRouter.get(
+  '/import',
+  asyncHandler(async (req, res) => {
+    renderImportForm(res, teamsImportConfig(Number(req.params.tournamentId)));
+  }),
+);
 
 // Traitement de l'import CSV (tout ou rien : on n'importe que si aucune erreur)
 teamsRouter.post(
   '/import',
   asyncHandler(async (req, res) => {
     const tournamentId = Number(req.params.tournamentId);
-    const csv = String(req.body.csv ?? '');
-    const { inputs, errors } = parseTeamsCsv(csv);
-
-    if (errors.length === 0 && inputs.length === 0) {
-      errors.push('Aucune équipe à importer.');
-    }
-    if (errors.length > 0) {
-      res.status(400).render('teams/import', {
-        title: 'Importer des équipes (CSV)',
-        csv,
-        errors,
-        imported: null,
-      });
-      return;
-    }
-
-    const imported = await createTeams(tournamentId, inputs);
-    res.render('teams/import', {
-      title: 'Importer des équipes (CSV)',
-      csv: '',
-      errors: [],
-      imported,
-    });
+    await handleCsvImport(res, String(req.body.csv ?? ''), teamsImportConfig(tournamentId));
   }),
 );
 

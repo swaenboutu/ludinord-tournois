@@ -1,0 +1,25 @@
+<%
+  // Formulaire d'import CSV partagé. Locals attendues :
+  //   formAction : URL de soumission ; cancelUrl : lien Annuler ; csv : contenu pré-rempli.
+%>
+<form method="post" action="<%= formAction %>">
+  <div id="dropZone" class="drop-zone">
+    <p class="drop-hint">Glisse-dépose ton fichier CSV ici</p>
+    <label class="button">
+      Choisir un fichier
+      <input type="file" id="csvFile" accept=".csv,text/csv,text/plain" hidden>
+    </label>
+    <p id="fileName" class="muted"></p>
+  </div>
+
+  <label>
+    Contenu CSV (rempli automatiquement depuis le fichier, modifiable)
+    <textarea name="csv" id="csvText" rows="10" placeholder="Colle ici le CSV, ou dépose / choisis un fichier ci-dessus"><%= csv %></textarea>
+  </label>
+  <div class="form-actions">
+    <button type="submit">Importer</button>
+    <a href="<%= cancelUrl %>">Annuler</a>
+  </div>
+</form>
+
+<script src="/js/csv-import.js" defer></script>

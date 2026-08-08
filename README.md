@@ -8,7 +8,8 @@ finale** à élimination par étapes. Un **affichage télé** public complète l
 
 - **Tournois** : création, hub de configuration, clôture.
 - **Jeux** : catalogue par tournoi (durée, capacité mini/maxi, solo ou équipe,
-  lien règles, disponibilité poule / finale / les deux).
+  lien règles, disponibilité poule / finale / les deux). **Import CSV** en lot
+  (séparateur `,` ou `;`, sans en-tête).
 - **Équipes & joueurs** : équipes de 2 joueurs, couleur de pion (suggérée libre),
   contact facultatif visible **admin uniquement**. Liste triée par total de points.
   **Import CSV** en lot (séparateur `,` ou `;`) avec page d'aide au format.

@@ -127,3 +127,37 @@ export async function updateGame(
 export async function deleteGame(tournamentId: number, gameId: number): Promise<void> {
   await pool.execute('DELETE FROM games WHERE id = ? AND tournament_id = ?', [gameId, tournamentId]);
 }
+
+// Crée plusieurs jeux en une seule transaction (tout ou rien). Renvoie le nombre créé.
+export async function createGames(tournamentId: number, inputs: GameInput[]): Promise<number> {
+  if (inputs.length === 0) {
+    return 0;
+  }
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    for (const input of inputs) {
+      await connection.execute(
+        `INSERT INTO games (tournament_id, name, duration_min, min_players, max_players, is_team_game, rules_url, availability)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          tournamentId,
+          input.name,
+          input.duration_min,
+          input.min_players,
+          input.max_players,
+          input.is_team_game ? 1 : 0,
+          input.rules_url,
+          input.availability,
+        ],
+      );
+    }
+    await connection.commit();
+    return inputs.length;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}

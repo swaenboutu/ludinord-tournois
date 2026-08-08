@@ -4,7 +4,10 @@
 
 <h1>Jeux</h1>
 
-<p><a class="button" href="/tournaments/<%= tournament.id %>/games/new">+ Nouveau jeu</a></p>
+<p>
+  <a class="button" href="/tournaments/<%= tournament.id %>/games/new">+ Nouveau jeu</a>
+  <a class="button" href="/tournaments/<%= tournament.id %>/games/import">Importer un CSV</a>
+</p>
 
 <% if (games.length === 0) { %>
   <p>Aucun jeu pour le moment.</p>

@@ -1,0 +1,48 @@
+<%- include('../partials/header', { title }) %>
+
+<p><a href="/tournaments/<%= tournament.id %>/games">← Jeux</a></p>
+
+<h1>Importer des jeux (CSV)</h1>
+
+<% if (imported !== null) { %>
+  <p class="success"><%= imported %> jeu<%= imported > 1 ? 'x' : '' %> importé<%= imported > 1 ? 's' : '' %> avec succès.</p>
+  <p><a class="button" href="/tournaments/<%= tournament.id %>/games">Voir les jeux</a></p>
+<% } %>
+
+<% if (errors.length > 0) { %>
+  <ul class="error">
+    <% errors.forEach(function (err) { %>
+      <li><%= err %></li>
+    <% }); %>
+  </ul>
+<% } %>
+
+<h2>Format attendu</h2>
+<p>Une ligne par jeu, sans ligne d'en-tête. Colonnes, dans cet ordre :</p>
+<ol>
+  <li><strong>Nom du jeu</strong> — obligatoire</li>
+  <li><strong>Durée</strong> (minutes) — facultative (entier ≥ 0)</li>
+  <li><strong>Joueurs minimum</strong> par table — obligatoire (entier ≥ 1)</li>
+  <li><strong>Joueurs maximum</strong> par table — obligatoire (≥ minimum)</li>
+  <li><strong>Jeu en équipe</strong> — <code>oui</code> / <code>non</code> (vide = non)</li>
+  <li><strong>Lien vers les règles</strong> — facultatif (<code>http://</code> ou <code>https://</code>)</li>
+  <li><strong>Disponibilité</strong> — <code>poule</code>, <code>finale</code> ou <code>both</code> (vide = both)</li>
+</ol>
+<ul>
+  <li>Séparateur <code>,</code> ou <code>;</code> (détecté automatiquement).</li>
+  <li>Import « tout ou rien » : si une ligne est invalide, rien n'est importé.</li>
+</ul>
+
+<h3>Exemple</h3>
+<pre class="csv-example">Catan;90;3;4;non;https://example.com/catan;both
+Time's Up;30;4;12;oui;;poule
+Skull;15;3;6;non;;finale</pre>
+
+<h2>Importer</h2>
+<%- include('../partials/csv-import-form', {
+  formAction: `/tournaments/${tournament.id}/games/import`,
+  cancelUrl: `/tournaments/${tournament.id}/games`,
+  csv,
+}) %>
+
+<%- include('../partials/footer') %>
