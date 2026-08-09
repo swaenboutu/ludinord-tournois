@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Connexion admin</h1>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form method="post" action="/login">
+      <input type="hidden" name="next" value="<%= next %>">
+      <label>
+        Mot de passe
+        <input type="password" name="password" required autofocus>
+      </label>
+      <div class="form-actions">
+        <button type="submit">Se connecter</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

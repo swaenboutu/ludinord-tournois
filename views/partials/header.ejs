@@ -8,3 +8,8 @@
 </head>
 <body>
   <main class="container <%= (typeof wide !== 'undefined' && wide) ? 'container-wide' : '' %>">
+    <div class="admin-topbar">
+      <form method="post" action="/logout">
+        <button type="submit" class="link-button">Déconnexion</button>
+      </form>
+    </div>

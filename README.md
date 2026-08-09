@@ -7,6 +7,9 @@ de poule** (classement des équipes) puis une **phase finale** à élimination p
 
 ## Fonctionnalités
 
+- **Accès admin protégé** : la configuration (tournois, jeux, équipes, poule,
+  finale) exige une connexion par mot de passe ; les écrans **TV** et **joueur**
+  restent publics. Mot de passe stocké **haché** (scrypt), jamais en clair.
 - **Tournois** : création (avec le **nombre de joueurs par équipe**), hub de
   configuration, clôture.
 - **Jeux** : catalogue par tournoi (durée, capacité mini/maxi, solo ou équipe,
@@ -76,6 +79,9 @@ mysql -u root -p -e "CREATE DATABASE tournoi CHARACTER SET utf8mb4 COLLATE utf8m
 
 # 4. Migrations : crée / met à jour le schéma
 npm run migrate
+
+# 5. Mot de passe admin (obligatoire pour accéder à la configuration)
+npm run set-admin-password -- "mon-mot-de-passe"
 ```
 
 > **Migrations** : les fichiers `db/migrations/*.sql` (numérotés) sont appliqués dans
@@ -87,6 +93,7 @@ npm run migrate
 
 ```bash
 npm run migrate    # applique les migrations de base de données
+npm run set-admin-password -- "xxx"  # définit/replace le mot de passe admin (haché)
 npm run dev        # développement (rechargement auto via tsx)
 npm run build      # compilation TypeScript -> dist/
 npm start          # exécution du build (node dist/server.js)
@@ -97,6 +104,33 @@ Le serveur écoute sur `http://localhost:3000` (port configurable via `PORT`).
 L'affichage télé d'un tournoi est accessible sur `/tournaments/:id/display/pool`.
 Sonde de santé : `GET /health` (200 si la base répond, 503 sinon). Le serveur
 s'arrête proprement sur SIGINT/SIGTERM (fermeture du pool MySQL).
+
+## Authentification admin
+
+La configuration (tournois, jeux, équipes, poule, finale) est protégée par un mot
+de passe unique. Les écrans **TV** (`/display/...`) et **joueur** (`/player/...`)
+restent publics.
+
+**Définir ou changer le mot de passe** (la table `app_settings` doit exister →
+lance `npm run migrate` au préalable) :
+
+```bash
+npm run set-admin-password -- "mon-mot-de-passe"
+```
+
+- Le `--` est indispensable : il transmet le mot de passe au script (sinon npm
+  l'interprète comme une option). Sous PowerShell : `npm run set-admin-password -- "xxx"`.
+- Alternative sans exposer le mot de passe dans l'historique du shell :
+  `ADMIN_PASSWORD="xxx" npm run set-admin-password`.
+- Seul le **haché scrypt** est stocké (`sel$empreinte`), jamais le mot de passe en clair.
+- Aucune longueur minimale imposée.
+
+**Se connecter** : ouvre `/login`, saisis le mot de passe. La session est un cookie
+signé (12 h). Bouton **Déconnexion** en haut des pages admin.
+
+**Sessions persistantes** : définis `SESSION_SECRET` dans `.env` (chaîne aléatoire
+longue). Sans lui, un secret est généré à chaque démarrage → les admins sont
+déconnectés à chaque redémarrage.
 
 ## Conventions
 
@@ -115,5 +149,6 @@ s'arrête proprement sur SIGINT/SIGTERM (fermeture du pool MySQL).
 - [x] Affichage télé phase finale (arbre jusqu'à la demi-finale)
 - [x] Écran télé dédié à la finale (grille jeux × équipes)
 - [x] Espace joueur (identification, partie/jeu en cours, scores)
+- [x] Authentification admin (mot de passe haché, écrans publics épargnés)
 - [ ] Écrans télé rotatifs
 - [ ] Correctifs finale (cascade de re-qualification, bornage de la taille de départ)

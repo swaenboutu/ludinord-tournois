@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto';
+
 import dotenv from 'dotenv';
 
 // Charge les variables du fichier .env dans process.env
@@ -21,5 +23,10 @@ export const config = {
     user: required('DB_USER'),
     password: required('DB_PASSWORD'),
     database: required('DB_NAME'),
+  },
+  session: {
+    // Secret de signature des cookies de session admin. À définir dans .env pour
+    // que les sessions survivent aux redémarrages ; sinon secret aléatoire par process.
+    secret: process.env.SESSION_SECRET ?? randomBytes(32).toString('hex'),
   },
 } as const;

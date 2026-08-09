@@ -38,6 +38,28 @@ a {
   color: var(--color-accent);
 }
 
+/* Barre admin (déconnexion), alignée à droite au-dessus du contenu */
+.admin-topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.admin-topbar form {
+  margin: 0;
+}
+
+/* Bouton discret ressemblant à un lien (déconnexion) */
+.link-button {
+  padding: 0.2rem 0.4rem;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* ===== Boutons et liens d'action ===== */
 button,
 .button {

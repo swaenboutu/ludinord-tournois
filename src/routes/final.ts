@@ -23,13 +23,15 @@ import {
   advanceStage,
 } from '../repositories/finalRepository';
 import { loadTournament } from '../middleware/loadTournament';
+import { requireAuth } from '../middleware/requireAuth';
 import { parseRankInputs } from '../utils/rankForm';
 import { asyncHandler } from '../utils/asyncHandler';
 
 // mergeParams : rend req.params.tournamentId (du chemin de montage) accessible ici
 export const finalRouter = Router({ mergeParams: true });
 
-// Charge le tournoi parent (404 sinon) et le partage aux vues
+// Réservé à l'admin, puis charge le tournoi parent (404 sinon)
+finalRouter.use(requireAuth);
 finalRouter.use(loadTournament);
 
 // Vue d'ensemble : étapes existantes, ou création de la phase finale

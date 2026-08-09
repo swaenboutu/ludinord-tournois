@@ -16,13 +16,15 @@ import {
 } from '../repositories/partyRepository';
 import { listPoolStandings } from '../repositories/standingsRepository';
 import { loadTournament } from '../middleware/loadTournament';
+import { requireAuth } from '../middleware/requireAuth';
 import { parseRankInputs } from '../utils/rankForm';
 import { asyncHandler } from '../utils/asyncHandler';
 
 // mergeParams : rend req.params.tournamentId (du chemin de montage) accessible ici
 export const poolRouter = Router({ mergeParams: true });
 
-// Charge le tournoi parent (404 sinon) et le partage aux vues
+// Réservé à l'admin, puis charge le tournoi parent (404 sinon)
+poolRouter.use(requireAuth);
 poolRouter.use(loadTournament);
 
 // Vue d'ensemble : manches ordonnées + jeux ajoutables

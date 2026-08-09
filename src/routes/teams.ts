@@ -17,6 +17,7 @@ import { parseCsv, detectDelimiter } from '../utils/csv';
 import { handleCsvImport, renderImportForm, CsvImportConfig } from '../utils/csvImport';
 import { getTeamStanding } from '../repositories/standingsRepository';
 import { loadTournament } from '../middleware/loadTournament';
+import { requireAuth } from '../middleware/requireAuth';
 import { asyncHandler } from '../utils/asyncHandler';
 
 // mergeParams : rend req.params.tournamentId (du chemin de montage) accessible ici
@@ -75,7 +76,8 @@ function parseTeamForm(
   return { input: { name, color, players }, errors: [] };
 }
 
-// Charge le tournoi parent (404 sinon) et le partage aux vues
+// Réservé à l'admin, puis charge le tournoi parent (404 sinon)
+teamsRouter.use(requireAuth);
 teamsRouter.use(loadTournament);
 
 // Liste des équipes du tournoi

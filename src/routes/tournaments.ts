@@ -6,9 +6,13 @@ import {
   createTournament,
   closeTournament,
 } from '../repositories/tournamentRepository';
+import { requireAuth } from '../middleware/requireAuth';
 import { asyncHandler } from '../utils/asyncHandler';
 
 export const tournamentsRouter = Router();
+
+// Toutes les routes de gestion des tournois exigent une session admin
+tournamentsRouter.use(requireAuth);
 
 // Liste des tournois
 tournamentsRouter.get(

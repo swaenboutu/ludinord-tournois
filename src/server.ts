@@ -11,6 +11,7 @@ import { poolRouter } from './routes/pool';
 import { finalRouter } from './routes/final';
 import { displayRouter } from './routes/display';
 import { playerRouter } from './routes/player';
+import { authRouter } from './routes/auth';
 
 const app = express();
 
@@ -31,6 +32,9 @@ app.get('/health', (_req, res) => {
     .then(() => res.json({ status: 'ok' }))
     .catch(() => res.status(503).json({ status: 'error' }));
 });
+
+// Authentification admin (login / logout), publique
+app.use(authRouter);
 
 // La racine renvoie vers la liste des tournois (point d'entrée de la config)
 app.get('/', (_req, res) => {

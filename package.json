@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "migrate": "tsx src/db/migrate.ts",
+    "set-admin-password": "tsx src/db/setAdminPassword.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
