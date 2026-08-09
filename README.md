@@ -71,20 +71,22 @@ npm install
 cp .env.example .env
 # puis renseigner les identifiants MySQL dans .env (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME…)
 
-# 3. Base de données (adapter le nom de base à DB_NAME)
+# 3. Base de données : créer la base vide (adapter le nom à DB_NAME)
 mysql -u root -p -e "CREATE DATABASE tournoi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p tournoi < db/schema.sql
 
-# 4. Phase finale (tables additionnelles, requis pour la phase finale)
-mysql -u root -p tournoi < db/final_phase.sql
+# 4. Migrations : crée / met à jour le schéma
+npm run migrate
 ```
 
-> Base déjà installée avant l'ajout de la taille d'équipe configurable ? Applique
-> aussi la migration : `mysql -u root -p tournoi < db/team_size.sql`.
+> **Migrations** : les fichiers `db/migrations/*.sql` (numérotés) sont appliqués dans
+> l'ordre par `npm run migrate`, qui suit leur état dans la table `schema_migrations`.
+> La commande est **idempotente** et sûre sur base neuve comme existante — relance-la
+> après un `git pull` pour appliquer les nouvelles migrations.
 
 ## Lancement
 
 ```bash
+npm run migrate    # applique les migrations de base de données
 npm run dev        # développement (rechargement auto via tsx)
 npm run build      # compilation TypeScript -> dist/
 npm start          # exécution du build (node dist/server.js)
