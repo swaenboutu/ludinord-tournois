@@ -17,26 +17,30 @@
   </ul>
 <% } %>
 
+<% var teamSize = tournament.team_size; %>
 <h2>Format attendu</h2>
-<p>Une ligne par équipe. Colonnes, dans cet ordre :</p>
+<p>Une ligne par équipe (<%= teamSize %> joueur<%= teamSize > 1 ? 's' : '' %> par équipe). Colonnes, dans cet ordre :</p>
 <ol>
-  <li><strong>Nom de l'équipe</strong> — facultatif (par défaut : les deux pseudos)</li>
-  <li><strong>Pseudo du joueur 1</strong> — obligatoire</li>
-  <li><strong>Contact du joueur 1</strong> — facultatif (admin uniquement)</li>
-  <li><strong>Pseudo du joueur 2</strong> — obligatoire</li>
-  <li><strong>Contact du joueur 2</strong> — facultatif (admin uniquement)</li>
+  <li><strong>Nom de l'équipe</strong> — facultatif (par défaut : les pseudos)</li>
   <li><strong>Couleur</strong> — facultative, format <code>#RRGGBB</code> (auto-attribuée si vide)</li>
+  <% for (var i = 1; i <= teamSize; i++) { %>
+    <li><strong>Pseudo du joueur <%= i %></strong> — obligatoire</li>
+    <li><strong>Contact du joueur <%= i %></strong> — facultatif (admin uniquement)</li>
+  <% } %>
 </ol>
 <ul>
   <li>Séparateur <code>,</code> ou <code>;</code> (détecté automatiquement).</li>
-  <li>Les deux pseudos d'une équipe doivent être différents.</li>
+  <li>Les pseudos d'une même équipe doivent être différents.</li>
   <li>Import « tout ou rien » : si une ligne est invalide, rien n'est importé.</li>
 </ul>
 
 <h3>Exemple</h3>
-<pre class="csv-example">Les Dés Brouillés;Alice;0600000000;Bob;;#3366CC
-;Chloé;;David;david@mail.fr;
-Team Meeple;Emma;;Farid;;#DC3912</pre>
+<%
+  // Exemple généré selon la taille d'équipe : nom;couleur;pseudo1;contact1;...
+  var exCells = ['Les Dés Brouillés', '#3366CC'];
+  for (var e = 1; e <= teamSize; e++) { exCells.push('Joueur' + e); exCells.push(''); }
+%>
+<pre class="csv-example"><%= exCells.join(';') %></pre>
 
 <h2>Importer</h2>
 <%- include('../partials/csv-import-form', {

@@ -11,6 +11,7 @@ import {
   suggestColor,
   TeamInput,
   BulkTeamInput,
+  PlayerInput,
 } from '../repositories/teamRepository';
 import { parseCsv, detectDelimiter } from '../utils/csv';
 import { handleCsvImport, renderImportForm, CsvImportConfig } from '../utils/csvImport';
@@ -21,18 +22,20 @@ import { asyncHandler } from '../utils/asyncHandler';
 // mergeParams : rend req.params.tournamentId (du chemin de montage) accessible ici
 export const teamsRouter = Router({ mergeParams: true });
 
-// Valeurs par défaut d'un formulaire vierge (les 2 joueurs sont vides)
-const emptyValues = {
-  name: '',
-  color: '#3366CC',
-  players: [
-    { pseudo: '', contact: '' },
-    { pseudo: '', contact: '' },
-  ],
-};
+// Valeurs par défaut d'un formulaire vierge (teamSize joueurs vides)
+function emptyValues(teamSize: number) {
+  return {
+    name: '',
+    color: '#3366CC',
+    players: Array.from({ length: teamSize }, () => ({ pseudo: '', contact: '' })),
+  };
+}
 
 // Analyse et valide le formulaire d'équipe ; renvoie l'entrée validée OU les erreurs
-function parseTeamForm(body: Record<string, unknown>): { input: TeamInput | null; errors: string[] } {
+function parseTeamForm(
+  body: Record<string, unknown>,
+  teamSize: number,
+): { input: TeamInput | null; errors: string[] } {
   const errors: string[] = [];
 
   // Nom d'équipe facultatif (fallback = pseudos concaténés, calculé à l'affichage)
@@ -45,12 +48,12 @@ function parseTeamForm(body: Record<string, unknown>): { input: TeamInput | null
     errors.push('La couleur doit être au format hexadécimal (#RRGGBB).');
   }
 
-  // Les champs joueurs arrivent en tableaux : pseudo[0], pseudo[1], contact[0], contact[1]
+  // Les champs joueurs arrivent en tableaux : pseudo[i], contact[i]
   const pseudos = Array.isArray(body.pseudo) ? body.pseudo : [body.pseudo];
   const contacts = Array.isArray(body.contact) ? body.contact : [body.contact];
 
-  const players: { pseudo: string; contact: string | null }[] = [];
-  for (let i = 0; i < 2; i += 1) {
+  const players: PlayerInput[] = [];
+  for (let i = 0; i < teamSize; i += 1) {
     const pseudo = String(pseudos[i] ?? '').trim();
     if (pseudo === '') {
       errors.push(`Le pseudo du joueur ${i + 1} est obligatoire.`);
@@ -59,23 +62,17 @@ function parseTeamForm(body: Record<string, unknown>): { input: TeamInput | null
     players.push({ pseudo, contact: contactRaw === '' ? null : contactRaw });
   }
 
-  // Deux joueurs distincts au sein de l'équipe
-  if (players[0].pseudo !== '' && players[0].pseudo === players[1].pseudo) {
-    errors.push('Les deux joueurs doivent avoir des pseudos différents.');
+  // Pseudos distincts au sein de l'équipe (on ignore les vides déjà signalés)
+  const filled = players.map((p) => p.pseudo).filter((p) => p !== '');
+  if (new Set(filled).size !== filled.length) {
+    errors.push('Les joueurs doivent avoir des pseudos différents.');
   }
 
   if (errors.length > 0) {
     return { input: null, errors };
   }
 
-  return {
-    input: {
-      name,
-      color,
-      players: [players[0], players[1]],
-    },
-    errors: [],
-  };
+  return { input: { name, color, players }, errors: [] };
 }
 
 // Charge le tournoi parent (404 sinon) et le partage aux vues
@@ -95,10 +92,11 @@ teamsRouter.get(
   '/new',
   asyncHandler(async (req, res) => {
     const tournamentId = Number(req.params.tournamentId);
+    const teamSize = Number(res.locals.tournament.team_size);
     res.render('teams/form', {
       title: 'Nouvelle équipe',
       formAction: `/tournaments/${tournamentId}/teams`,
-      values: { ...emptyValues, color: await suggestColor(tournamentId) },
+      values: { ...emptyValues(teamSize), color: await suggestColor(tournamentId) },
       errors: [],
       standing: null,
     });
@@ -106,12 +104,12 @@ teamsRouter.get(
 );
 
 // Config d'import CSV des équipes (parse + création), mutualisée avec le helper générique
-function teamsImportConfig(tournamentId: number): CsvImportConfig<BulkTeamInput> {
+function teamsImportConfig(tournamentId: number, teamSize: number): CsvImportConfig<BulkTeamInput> {
   return {
     view: 'teams/import',
     title: 'Importer des équipes (CSV)',
     emptyMessage: 'Aucune équipe à importer.',
-    parse: parseTeamsCsv,
+    parse: (text) => parseTeamsCsv(text, teamSize),
     create: (inputs) => createTeams(tournamentId, inputs),
   };
 }
@@ -120,7 +118,8 @@ function teamsImportConfig(tournamentId: number): CsvImportConfig<BulkTeamInput>
 teamsRouter.get(
   '/import',
   asyncHandler(async (req, res) => {
-    renderImportForm(res, teamsImportConfig(Number(req.params.tournamentId)));
+    const teamSize = Number(res.locals.tournament.team_size);
+    renderImportForm(res, teamsImportConfig(Number(req.params.tournamentId), teamSize));
   }),
 );
 
@@ -129,7 +128,8 @@ teamsRouter.post(
   '/import',
   asyncHandler(async (req, res) => {
     const tournamentId = Number(req.params.tournamentId);
-    await handleCsvImport(res, String(req.body.csv ?? ''), teamsImportConfig(tournamentId));
+    const teamSize = Number(res.locals.tournament.team_size);
+    await handleCsvImport(res, String(req.body.csv ?? ''), teamsImportConfig(tournamentId, teamSize));
   }),
 );
 
@@ -148,12 +148,13 @@ teamsRouter.post(
   '/',
   asyncHandler(async (req, res) => {
     const tournamentId = Number(req.params.tournamentId);
-    const { input, errors } = parseTeamForm(req.body);
+    const teamSize = Number(res.locals.tournament.team_size);
+    const { input, errors } = parseTeamForm(req.body, teamSize);
     if (input === null) {
       res.status(400).render('teams/form', {
         title: 'Nouvelle équipe',
         formAction: `/tournaments/${tournamentId}/teams`,
-        values: rebuildValues(req.body),
+        values: rebuildValues(req.body, teamSize),
         errors,
         standing: null,
       });
@@ -174,6 +175,7 @@ teamsRouter.get(
       res.status(404).send('Équipe introuvable');
       return;
     }
+    const teamSize = Number(res.locals.tournament.team_size);
     const standing = await getTeamStanding(tournamentId, team.id);
     res.render('teams/form', {
       title: "Modifier l'équipe",
@@ -182,10 +184,10 @@ teamsRouter.get(
       values: {
         name: team.name ?? '',
         color: team.color,
-        players: [
-          team.players[0] ?? { pseudo: '', contact: '' },
-          team.players[1] ?? { pseudo: '', contact: '' },
-        ],
+        players: Array.from({ length: teamSize }, (_unused, i) => {
+          const player = team.players[i];
+          return { pseudo: player ? player.pseudo : '', contact: player ? player.contact ?? '' : '' };
+        }),
       },
       errors: [],
     });
@@ -198,12 +200,13 @@ teamsRouter.post(
   asyncHandler(async (req, res) => {
     const tournamentId = Number(req.params.tournamentId);
     const teamId = Number(req.params.teamId);
-    const { input, errors } = parseTeamForm(req.body);
+    const teamSize = Number(res.locals.tournament.team_size);
+    const { input, errors } = parseTeamForm(req.body, teamSize);
     if (input === null) {
       res.status(400).render('teams/form', {
         title: "Modifier l'équipe",
         formAction: `/tournaments/${tournamentId}/teams/${teamId}`,
-        values: rebuildValues(req.body),
+        values: rebuildValues(req.body, teamSize),
         errors,
         standing: null,
       });
@@ -239,8 +242,11 @@ const CSV_HEADER_TOKENS = [
 ];
 
 // Analyse un CSV d'équipes en entrées prêtes pour createTeams, avec les erreurs par ligne.
-// Colonnes attendues : nom_equipe, pseudo_1, contact_1, pseudo_2, contact_2, couleur
-function parseTeamsCsv(text: string): { inputs: BulkTeamInput[]; errors: string[] } {
+// Colonnes : nom_equipe, couleur, puis teamSize paires (pseudo_i, contact_i).
+function parseTeamsCsv(
+  text: string,
+  teamSize: number,
+): { inputs: BulkTeamInput[]; errors: string[] } {
   const errors: string[] = [];
   const inputs: BulkTeamInput[] = [];
 
@@ -263,21 +269,22 @@ function parseTeamsCsv(text: string): { inputs: BulkTeamInput[]; errors: string[
   dataRows.forEach((row, index) => {
     const lineNumber = hasHeader ? index + 2 : index + 1; // n° de ligne dans le fichier
     const name = (row[0] ?? '').trim();
-    const pseudo1 = (row[1] ?? '').trim();
-    const contact1 = (row[2] ?? '').trim();
-    const pseudo2 = (row[3] ?? '').trim();
-    const contact2 = (row[4] ?? '').trim();
-    const colorRaw = (row[5] ?? '').trim();
+    const colorRaw = (row[1] ?? '').trim();
 
     const rowErrors: string[] = [];
-    if (pseudo1 === '') {
-      rowErrors.push('pseudo du joueur 1 manquant');
+    const players: PlayerInput[] = [];
+    for (let i = 0; i < teamSize; i += 1) {
+      const pseudo = (row[2 + i * 2] ?? '').trim();
+      const contact = (row[3 + i * 2] ?? '').trim();
+      if (pseudo === '') {
+        rowErrors.push(`pseudo du joueur ${i + 1} manquant`);
+      }
+      players.push({ pseudo, contact: contact === '' ? null : contact });
     }
-    if (pseudo2 === '') {
-      rowErrors.push('pseudo du joueur 2 manquant');
-    }
-    if (pseudo1 !== '' && pseudo1 === pseudo2) {
-      rowErrors.push('les deux pseudos sont identiques');
+
+    const filled = players.map((p) => p.pseudo).filter((p) => p !== '');
+    if (new Set(filled).size !== filled.length) {
+      rowErrors.push('des pseudos sont identiques');
     }
 
     let color: string | null = null;
@@ -294,29 +301,22 @@ function parseTeamsCsv(text: string): { inputs: BulkTeamInput[]; errors: string[
       return;
     }
 
-    inputs.push({
-      name: name === '' ? null : name,
-      color,
-      players: [
-        { pseudo: pseudo1, contact: contact1 === '' ? null : contact1 },
-        { pseudo: pseudo2, contact: contact2 === '' ? null : contact2 },
-      ],
-    });
+    inputs.push({ name: name === '' ? null : name, color, players });
   });
 
   return { inputs, errors };
 }
 
 // Reconstruit les valeurs du formulaire depuis le corps brut (pour réafficher après erreur)
-function rebuildValues(body: Record<string, unknown>): typeof emptyValues {
+function rebuildValues(body: Record<string, unknown>, teamSize: number): ReturnType<typeof emptyValues> {
   const pseudos = Array.isArray(body.pseudo) ? body.pseudo : [body.pseudo];
   const contacts = Array.isArray(body.contact) ? body.contact : [body.contact];
   return {
     name: String(body.name ?? ''),
     color: String(body.color ?? '#3366CC'),
-    players: [
-      { pseudo: String(pseudos[0] ?? ''), contact: String(contacts[0] ?? '') },
-      { pseudo: String(pseudos[1] ?? ''), contact: String(contacts[1] ?? '') },
-    ],
+    players: Array.from({ length: teamSize }, (_unused, i) => ({
+      pseudo: String(pseudos[i] ?? ''),
+      contact: String(contacts[i] ?? ''),
+    })),
   };
 }

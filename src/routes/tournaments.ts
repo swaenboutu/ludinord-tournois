@@ -42,14 +42,23 @@ tournamentsRouter.post(
   '/',
   asyncHandler(async (req, res) => {
     const name = String(req.body.name ?? '').trim();
+    const teamSize = Number(req.body.team_size);
     if (name === '') {
       // Nom manquant : on réaffiche le formulaire avec un message
-      res
-        .status(400)
-        .render('tournaments/new', { title: 'Nouveau tournoi', error: 'Le nom est obligatoire.' });
+      res.status(400).render('tournaments/new', {
+        title: 'Nouveau tournoi',
+        error: 'Le nom est obligatoire.',
+      });
       return;
     }
-    await createTournament(name);
+    if (!Number.isInteger(teamSize) || teamSize < 1) {
+      res.status(400).render('tournaments/new', {
+        title: 'Nouveau tournoi',
+        error: 'Le nombre de joueurs par équipe doit être un entier supérieur ou égal à 1.',
+      });
+      return;
+    }
+    await createTournament(name, teamSize);
     res.redirect('/tournaments');
   }),
 );

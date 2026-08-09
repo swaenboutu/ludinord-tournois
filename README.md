@@ -1,16 +1,18 @@
 # Tournoi de jeux de société
 
-Application web de gestion d'un tournoi de jeux de société joué en **équipes de 2**,
-en deux phases : une **phase de poule** (classement des équipes) puis une **phase
-finale** à élimination par étapes. Un **affichage télé** public complète l'admin.
+Application web de gestion d'un tournoi de jeux de société joué en **équipes**
+(taille configurable par tournoi, de 1 à N joueurs), en deux phases : une **phase
+de poule** (classement des équipes) puis une **phase finale** à élimination par
+étapes. Un **affichage télé** public et un **espace joueur** complètent l'admin.
 
 ## Fonctionnalités
 
-- **Tournois** : création, hub de configuration, clôture.
+- **Tournois** : création (avec le **nombre de joueurs par équipe**), hub de
+  configuration, clôture.
 - **Jeux** : catalogue par tournoi (durée, capacité mini/maxi, solo ou équipe,
   lien règles, disponibilité poule / finale / les deux). **Import CSV** en lot
   (séparateur `,` ou `;`, sans en-tête).
-- **Équipes & joueurs** : équipes de 2 joueurs, couleur de pion (suggérée libre),
+- **Équipes & joueurs** : équipes de N joueurs (taille du tournoi), couleur de pion (suggérée libre),
   contact facultatif visible **admin uniquement**. Liste triée par total de points.
   **Import CSV** en lot (séparateur `,` ou `;`) avec page d'aide au format.
 - **Phase de poule** :
@@ -39,7 +41,7 @@ finale** à élimination par étapes. Un **affichage télé** public complète l
   table. Sans égalité, le 1ᵉʳ marque N, le 2ᵉ N−1, etc.
 - **Ex æquo** : places identiques → mêmes points, le(s) rang(s) suivant(s) sont sautés.
 - Jeu **solo** : le participant est le joueur ; le total d'une **équipe** = somme des
-  points de ses 2 joueurs.
+  points de ses joueurs.
 - Jeu **en équipe** : le participant est l'équipe, qui marque directement.
 - **Poule** : classement par total de points décroissant.
 - **Finale** : points remis à zéro à chaque étape ; à égalité sur la ligne de
@@ -76,6 +78,9 @@ mysql -u root -p tournoi < db/schema.sql
 # 4. Phase finale (tables additionnelles, requis pour la phase finale)
 mysql -u root -p tournoi < db/final_phase.sql
 ```
+
+> Base déjà installée avant l'ajout de la taille d'équipe configurable ? Applique
+> aussi la migration : `mysql -u root -p tournoi < db/team_size.sql`.
 
 ## Lancement
 

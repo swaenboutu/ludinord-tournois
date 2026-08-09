@@ -155,9 +155,10 @@ export async function drawRound(tournamentId: number, roundId: number): Promise<
     await connection.beginTransaction();
 
     const [roundRows] = await connection.execute<RowDataPacket[]>(
-      `SELECT g.is_team_game, g.min_players, g.max_players
+      `SELECT g.is_team_game, g.min_players, g.max_players, tr.team_size
          FROM pool_rounds r
          JOIN games g ON g.id = r.game_id
+         JOIN tournaments tr ON tr.id = r.tournament_id
         WHERE r.id = ? AND r.tournament_id = ? LIMIT 1`,
       [roundId, tournamentId],
     );
@@ -168,6 +169,7 @@ export async function drawRound(tournamentId: number, roundId: number): Promise<
     }
     const round = roundRows[0];
     const isTeam = round.is_team_game === 1;
+    const teamSize = Math.max(1, Number(round.team_size));
 
     const poolId = await ensurePoolId(connection, tournamentId);
 
@@ -195,9 +197,9 @@ export async function drawRound(tournamentId: number, roundId: number): Promise<
         return { tables: 0, units: 0 };
       }
 
-      // Capacité en équipes : joueurs par table ÷ 2 (une équipe = 2 joueurs)
-      const maxPer = Math.max(1, Math.floor(round.max_players / 2));
-      const minPer = Math.max(1, Math.floor(round.min_players / 2));
+      // Capacité en équipes : joueurs par table ÷ taille d'équipe
+      const maxPer = Math.max(1, Math.floor(round.max_players / teamSize));
+      const minPer = Math.max(1, Math.floor(round.min_players / teamSize));
       const shuffled = shuffle(teamIds);
       const sizes = splitBalanced(shuffled.length, teamTableCount(shuffled.length, maxPer, minPer));
 
@@ -232,9 +234,10 @@ export async function drawRound(tournamentId: number, roundId: number): Promise<
       }
       const teamGroups = [...byTeam.values()];
 
-      // Au moins 2 tables pour pouvoir séparer les 2 joueurs d'une équipe
+      // Au moins `teamSize` tables pour séparer tous les coéquipiers d'une équipe
       const maxPer = round.max_players;
-      let numTables = Math.max(Math.ceil(unitCount / maxPer), unitCount >= 2 ? 2 : 1);
+      const minSeparationTables = teamSize >= 2 ? teamSize : 1;
+      let numTables = Math.max(Math.ceil(unitCount / maxPer), minSeparationTables);
       numTables = Math.min(numTables, unitCount); // jamais de table vide
       const sizes = splitBalanced(unitCount, numTables);
 

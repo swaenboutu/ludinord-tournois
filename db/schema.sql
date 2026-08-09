@@ -11,6 +11,7 @@
 CREATE TABLE tournaments (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     name       VARCHAR(100) NOT NULL,
+    team_size  TINYINT UNSIGNED NOT NULL DEFAULT 2,  -- nb de joueurs par équipe (fixe pour le tournoi)
     status     ENUM('open','closed') NOT NULL DEFAULT 'open',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     closed_at  DATETIME NULL,             -- rempli à la clôture
@@ -40,7 +41,7 @@ CREATE TABLE teams (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------- Liaison joueurs <-> équipe ----------
--- Une équipe compte toujours 2 joueurs (contrainte "exactement 2" gérée côté app).
+-- Une équipe compte tournaments.team_size joueurs (contrainte gérée côté app).
 -- Un joueur n'appartient qu'à une seule équipe (UNIQUE sur player_id).
 CREATE TABLE team_players (
     team_id   INT UNSIGNED NOT NULL,

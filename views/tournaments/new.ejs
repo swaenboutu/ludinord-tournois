@@ -11,6 +11,10 @@
     Nom du tournoi
     <input type="text" name="name" required maxlength="100" autofocus>
   </label>
+  <label>
+    Joueurs par équipe
+    <input type="number" name="team_size" value="2" min="1" max="20" required>
+  </label>
   <div class="form-actions">
     <button type="submit">Créer</button>
     <a href="/tournaments">Annuler</a>

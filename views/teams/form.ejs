@@ -29,7 +29,7 @@
   <label>
     Nom de l'équipe (facultatif)
     <input type="text" name="name" value="<%= values.name %>" maxlength="80"
-           placeholder="Par défaut : les deux pseudos">
+           placeholder="Par défaut : les pseudos">
   </label>
 
   <label class="color-field">
@@ -37,20 +37,20 @@
     <input type="color" name="color" value="<%= values.color %>">
   </label>
 
-  <% for (var i = 0; i < 2; i++) { %>
+  <% values.players.forEach(function (player, i) { %>
     <fieldset>
       <legend>Joueur <%= i + 1 %></legend>
       <label>
         Pseudo
-        <input type="text" name="pseudo" value="<%= values.players[i].pseudo %>"
+        <input type="text" name="pseudo" value="<%= player.pseudo %>"
                required maxlength="50" <%= i === 0 ? 'autofocus' : '' %>>
       </label>
       <label>
         Contact (facultatif, visible admin uniquement)
-        <input type="text" name="contact" value="<%= values.players[i].contact %>" maxlength="50">
+        <input type="text" name="contact" value="<%= player.contact %>" maxlength="50">
       </label>
     </fieldset>
-  <% } %>
+  <% }); %>
 
   <div class="form-actions">
     <button type="submit">Enregistrer</button>

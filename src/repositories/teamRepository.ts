@@ -9,14 +9,14 @@ export interface Player {
   contact: string | null;
 }
 
-// Une équipe et ses deux joueurs (rattachement au tournoi via l'équipe)
+// Une équipe et ses joueurs (rattachement au tournoi via l'équipe)
 export interface Team {
   id: number;
   tournament_id: number;
   name: string | null;
   color: string;
-  players: Player[]; // toujours 2 (contrainte gérée côté app)
-  total_points: number; // points jeux en équipe + points solo des 2 joueurs
+  players: Player[]; // tournaments.team_size joueurs (contrainte gérée côté app)
+  total_points: number; // points jeux en équipe + points solo des joueurs
 }
 
 // Données d'un joueur saisies dans le formulaire
@@ -25,11 +25,11 @@ export interface PlayerInput {
   contact: string | null;
 }
 
-// Données d'une équipe : nom facultatif, couleur du pion, exactement 2 joueurs
+// Données d'une équipe : nom facultatif, couleur du pion, joueurs (taille = team_size)
 export interface TeamInput {
   name: string | null;
   color: string;
-  players: [PlayerInput, PlayerInput];
+  players: PlayerInput[];
 }
 
 // Palette par défaut : couleurs distinctes assignées aux pions dans l'ordre
@@ -207,7 +207,7 @@ export async function createTeam(tournamentId: number, input: TeamInput): Promis
 export interface BulkTeamInput {
   name: string | null;
   color: string | null;
-  players: [PlayerInput, PlayerInput];
+  players: PlayerInput[];
 }
 
 // Crée plusieurs équipes (et leurs joueurs) en une seule transaction.

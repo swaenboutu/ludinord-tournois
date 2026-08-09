@@ -6,6 +6,7 @@ import { pool } from '../db/pool';
 export interface Tournament {
   id: number;
   name: string;
+  team_size: number; // nb de joueurs par équipe (fixe pour le tournoi)
   status: 'open' | 'closed';
   created_at: Date;
   closed_at: Date | null;
@@ -17,7 +18,7 @@ interface TournamentRow extends RowDataPacket, Tournament {}
 // Retourne tous les tournois, du plus récent au plus ancien
 export async function listTournaments(): Promise<Tournament[]> {
   const [rows] = await pool.query<TournamentRow[]>(
-    'SELECT id, name, status, created_at, closed_at FROM tournaments ORDER BY created_at DESC',
+    'SELECT id, name, team_size, status, created_at, closed_at FROM tournaments ORDER BY created_at DESC',
   );
   return rows;
 }
@@ -25,17 +26,17 @@ export async function listTournaments(): Promise<Tournament[]> {
 // Récupère un tournoi par son identifiant, ou null s'il n'existe pas
 export async function getTournament(id: number): Promise<Tournament | null> {
   const [rows] = await pool.execute<TournamentRow[]>(
-    'SELECT id, name, status, created_at, closed_at FROM tournaments WHERE id = ? LIMIT 1',
+    'SELECT id, name, team_size, status, created_at, closed_at FROM tournaments WHERE id = ? LIMIT 1',
     [id],
   );
   return rows[0] ?? null;
 }
 
-// Crée un tournoi et retourne son identifiant
-export async function createTournament(name: string): Promise<number> {
+// Crée un tournoi (avec sa taille d'équipe) et retourne son identifiant
+export async function createTournament(name: string, teamSize: number): Promise<number> {
   const [result] = await pool.execute<ResultSetHeader>(
-    'INSERT INTO tournaments (name) VALUES (?)',
-    [name],
+    'INSERT INTO tournaments (name, team_size) VALUES (?, ?)',
+    [name, teamSize],
   );
   return result.insertId;
 }
