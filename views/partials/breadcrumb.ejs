@@ -1,0 +1,14 @@
+<%
+  // Fil d'Ariane. Local attendu : items = [{ label, href? }, ...].
+  // Le dernier élément (sans href) représente la page courante.
+%>
+<nav class="breadcrumb" aria-label="Fil d'Ariane">
+  <% items.forEach(function (item, i) { %>
+    <% if (item.href) { %>
+      <a href="<%= item.href %>"><%= item.label %></a>
+    <% } else { %>
+      <span class="breadcrumb-current"><%= item.label %></span>
+    <% } %>
+    <% if (i < items.length - 1) { %><span class="breadcrumb-sep">›</span><% } %>
+  <% }); %>
+</nav>

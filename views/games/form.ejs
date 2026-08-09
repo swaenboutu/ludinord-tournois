@@ -1,6 +1,14 @@
 <%- include('../partials/header', { title }) %>
 
-<p><a href="/tournaments/<%= tournament.id %>/games">← Jeux</a></p>
+<%
+  var gameLabel = (values.name && String(values.name).trim() !== '') ? values.name : title;
+%>
+<%- include('../partials/breadcrumb', { items: [
+  { label: 'Tournois', href: '/tournaments' },
+  { label: tournament.name, href: `/tournaments/${tournament.id}` },
+  { label: 'Jeux', href: `/tournaments/${tournament.id}/games` },
+  { label: gameLabel },
+] }) %>
 
 <h1><%= title %></h1>
 

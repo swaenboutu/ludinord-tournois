@@ -1,6 +1,10 @@
 <%- include('../partials/header', { title }) %>
 
-<p><a href="/tournaments/<%= tournament.id %>">← <%= tournament.name %></a></p>
+<%- include('../partials/breadcrumb', { items: [
+  { label: 'Tournois', href: '/tournaments' },
+  { label: tournament.name, href: `/tournaments/${tournament.id}` },
+  { label: 'Équipes' },
+] }) %>
 
 <h1>Équipes</h1>
 

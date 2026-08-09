@@ -1,6 +1,12 @@
 <%- include('../partials/header', { title, wide: true }) %>
 
-<p><a href="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>">← <%= stage.name %></a></p>
+<%- include('../partials/breadcrumb', { items: [
+  { label: 'Tournois', href: '/tournaments' },
+  { label: tournament.name, href: `/tournaments/${tournament.id}` },
+  { label: 'Phase finale', href: `/tournaments/${tournament.id}/final` },
+  { label: stage.name, href: `/tournaments/${tournament.id}/final/stages/${stage.id}` },
+  { label: `Manche ${position} — ${round.game_name}` },
+] }) %>
 
 <%- include('../partials/parties-tables', {
   basePath: `/tournaments/${tournament.id}/final`,

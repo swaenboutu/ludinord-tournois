@@ -1,6 +1,11 @@
 <%- include('../partials/header', { title }) %>
 
-<p><a href="/tournaments/<%= tournament.id %>/games">← Jeux</a></p>
+<%- include('../partials/breadcrumb', { items: [
+  { label: 'Tournois', href: '/tournaments' },
+  { label: tournament.name, href: `/tournaments/${tournament.id}` },
+  { label: 'Jeux', href: `/tournaments/${tournament.id}/games` },
+  { label: 'Importer un CSV' },
+] }) %>
 
 <h1>Importer des jeux (CSV)</h1>
 

@@ -1,6 +1,11 @@
 <%- include('../partials/header', { title }) %>
 
-<p><a href="/tournaments/<%= tournament.id %>/final">← Phase finale</a></p>
+<%- include('../partials/breadcrumb', { items: [
+  { label: 'Tournois', href: '/tournaments' },
+  { label: tournament.name, href: `/tournaments/${tournament.id}` },
+  { label: 'Phase finale', href: `/tournaments/${tournament.id}/final` },
+  { label: stage.name },
+] }) %>
 
 <h1><%= stage.name %></h1>
 <p><%= stage.team_count %> équipes · la moitié (<%= qualifyCount %>) <%= hasNext ? 'passe à l\'étape suivante' : 'remporte le tournoi' %>.</p>

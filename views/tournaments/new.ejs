@@ -1,5 +1,10 @@
 <%- include('../partials/header', { title }) %>
 
+<%- include('../partials/breadcrumb', { items: [
+  { label: 'Tournois', href: '/tournaments' },
+  { label: 'Nouveau tournoi' },
+] }) %>
+
 <h1>Nouveau tournoi</h1>
 
 <% if (typeof error !== 'undefined') { %>

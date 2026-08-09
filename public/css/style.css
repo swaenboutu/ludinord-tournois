@@ -98,6 +98,32 @@ button:hover,
   background: var(--color-warning);
 }
 
+/* ===== Fil d'Ariane ===== */
+.breadcrumb {
+  margin: 0 0 1.2rem;
+  font-size: 0.9rem;
+  color: #666666;
+}
+
+.breadcrumb a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  margin: 0 0.4rem;
+  color: #999999;
+}
+
+.breadcrumb-current {
+  color: #333333;
+  font-weight: 600;
+}
+
 /* ===== Tableaux ===== */
 table {
   width: 100%;

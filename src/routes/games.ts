@@ -194,7 +194,7 @@ gamesRouter.get(
       return;
     }
     res.render('games/form', {
-      title: 'Modifier le jeu',
+      title: `Modifier le jeu « ${game.name} »`,
       formAction: `/tournaments/${tournamentId}/games/${game.id}`,
       values: game,
       errors: [],
@@ -210,8 +210,9 @@ gamesRouter.post(
     const gameId = Number(req.params.gameId);
     const { input, errors } = parseGameForm(req.body);
     if (input === null) {
+      const submittedName = String(req.body.name ?? '').trim();
       res.status(400).render('games/form', {
-        title: 'Modifier le jeu',
+        title: submittedName !== '' ? `Modifier le jeu « ${submittedName} »` : 'Modifier le jeu',
         formAction: `/tournaments/${tournamentId}/games/${gameId}`,
         values: req.body,
         errors,
