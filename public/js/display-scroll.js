@@ -10,6 +10,11 @@
 
   var el = document.querySelector('[data-autoscroll]');
 
+  // Empêche le navigateur de restaurer la position de défilement au rechargement
+  if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+  }
+
   function isScrollable() {
     return !!el && el.scrollHeight > el.clientHeight + 4;
   }
@@ -32,6 +37,10 @@
   }
 
   function start() {
+    // Repart toujours du haut (le navigateur peut avoir restauré la position)
+    if (el) {
+      el.scrollTop = 0;
+    }
     if (!isScrollable()) {
       window.setTimeout(reload, REFRESH_MS);
       return;
