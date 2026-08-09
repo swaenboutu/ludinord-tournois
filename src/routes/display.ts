@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { listPoolRounds } from '../repositories/poolRoundRepository';
 import { listPoolStandings } from '../repositories/standingsRepository';
-import { listFinalStages, getStageStandings } from '../repositories/finalRepository';
+import { listFinalStages, getStageStandings, getFinaleGrid } from '../repositories/finalRepository';
 import { loadTournament } from '../middleware/loadTournament';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -57,5 +57,15 @@ displayRouter.get(
     }
 
     res.render('display/final', { bracket });
+  }),
+);
+
+// Écran dédié à la finale : jeux, points de chaque finaliste par jeu, total, meneur
+displayRouter.get(
+  '/finale',
+  asyncHandler(async (req, res) => {
+    const tournamentId = Number(req.params.tournamentId);
+    const grid = await getFinaleGrid(tournamentId);
+    res.render('display/finale', { grid });
   }),
 );

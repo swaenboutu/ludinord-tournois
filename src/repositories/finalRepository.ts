@@ -69,9 +69,9 @@ function stageName(teamCount: number): string {
     case 8:
       return 'Quarts de finale';
     case 16:
-      return '8es de finale';
+      return '8emes de finale';
     case 32:
-      return '16es de finale';
+      return '16emes de finale';
     default:
       return `Top ${teamCount}`;
   }
@@ -686,4 +686,91 @@ export async function advanceStage(tournamentId: number, stageId: number): Promi
   } finally {
     connection.release();
   }
+}
+
+// ---------- Grille de la finale (dernière étape) ----------
+
+// Ligne d'une équipe finaliste : points par jeu (dans l'ordre des manches) + total.
+export interface FinaleTeamRow {
+  team_id: number;
+  name: string | null;
+  color: string;
+  pseudos: string | null;
+  points: number[]; // aligné sur l'ordre de `rounds`
+  total: number;
+  leading: boolean; // équipe en tête (total maximal, > 0)
+}
+
+// Grille de la finale : jeux (manches) et points de chaque finaliste par jeu.
+export interface FinaleGrid {
+  name: string;
+  rounds: { id: number; game_name: string }[];
+  teams: FinaleTeamRow[];
+}
+
+// Assemble la grille de la finale (dernière étape) : finalistes, jeux, points par jeu.
+// Renvoie null si aucune phase finale n'est configurée.
+export async function getFinaleGrid(tournamentId: number): Promise<FinaleGrid | null> {
+  const [stageRows] = await pool.execute<RowDataPacket[]>(
+    'SELECT id, team_count FROM final_stages WHERE tournament_id = ? ORDER BY stage_order DESC LIMIT 1',
+    [tournamentId],
+  );
+  if (stageRows.length === 0) {
+    return null;
+  }
+  const stageId = stageRows[0].id as number;
+  const teamCount = Number(stageRows[0].team_count);
+
+  const teams = await listStageTeams(stageId);
+  const rounds = await listStageRounds(stageId);
+
+  // Points par (manche, équipe) : jeu en équipe -> résultat de l'équipe ;
+  // jeu solo -> somme des points des joueurs de l'équipe.
+  const [pointRows] = await pool.execute<RowDataPacket[]>(
+    `SELECT fr.id AS round_id, fst.team_id, COALESCE(SUM(fpr.points), 0) AS points
+       FROM final_rounds fr
+       JOIN final_stage_teams fst ON fst.stage_id = fr.stage_id
+       LEFT JOIN final_parties fp ON fp.final_round_id = fr.id
+       LEFT JOIN final_party_results fpr ON fpr.final_party_id = fp.id
+            AND (fpr.team_id = fst.team_id
+                 OR fpr.player_id IN (
+                   SELECT tp.player_id FROM team_players tp WHERE tp.team_id = fst.team_id
+                 ))
+      WHERE fr.stage_id = ?
+      GROUP BY fr.id, fst.team_id`,
+    [stageId],
+  );
+
+  const pointsByKey = new Map<string, number>();
+  for (const row of pointRows) {
+    pointsByKey.set(`${row.round_id}:${row.team_id}`, Number(row.points));
+  }
+
+  const teamRows: FinaleTeamRow[] = teams.map((team) => {
+    const points = rounds.map((round) => pointsByKey.get(`${round.id}:${team.team_id}`) ?? 0);
+    const total = points.reduce((sum, p) => sum + p, 0);
+    return {
+      team_id: team.team_id,
+      name: team.name,
+      color: team.color,
+      pseudos: team.pseudos,
+      points,
+      total,
+      leading: false,
+    };
+  });
+
+  // Équipe(s) en tête : total maximal strictement positif
+  const maxTotal = teamRows.reduce((max, t) => Math.max(max, t.total), 0);
+  if (maxTotal > 0) {
+    for (const team of teamRows) {
+      team.leading = team.total === maxTotal;
+    }
+  }
+
+  return {
+    name: stageName(teamCount),
+    rounds: rounds.map((r) => ({ id: r.id, game_name: r.game_name })),
+    teams: teamRows,
+  };
 }

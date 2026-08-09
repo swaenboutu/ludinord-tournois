@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= tournament.name %> — Finale</title>
+  <link rel="stylesheet" href="/css/display.css">
+</head>
+<body class="display">
+  <header class="display-header">
+    <div class="display-brand">
+      <img class="display-logo" src="/images/ludinord-logo.svg" alt="LudiNord">
+      <h1><%= tournament.name %></h1>
+    </div>
+    <span class="display-phase"><%= grid ? grid.name : 'Finale' %></span>
+  </header>
+
+  <% if (!grid || grid.teams.length === 0) { %>
+    <p class="empty">La finale n'est pas encore définie.</p>
+  <% } else { %>
+    <table class="finale-grid">
+      <thead>
+        <tr>
+          <th class="game">Jeu</th>
+          <% grid.teams.forEach(function (t) { %>
+            <% var label = (t.name && t.name.trim() !== '') ? t.name : t.pseudos; %>
+            <th class="<%= t.leading ? 'leading' : '' %>">
+              <span class="swatch" style="background: <%= t.color %>"></span>
+              <%= t.leading ? '👑 ' : '' %><%= label %>
+            </th>
+          <% }); %>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (grid.rounds.length === 0) { %>
+          <tr>
+            <td class="game" colspan="<%= grid.teams.length + 1 %>">Aucun jeu défini pour la finale.</td>
+          </tr>
+        <% } else { %>
+          <% grid.rounds.forEach(function (round, i) { %>
+            <tr>
+              <td class="game"><%= round.game_name %></td>
+              <% grid.teams.forEach(function (t) { %>
+                <td class="<%= t.leading ? 'leading' : '' %>"><%= t.points[i] %></td>
+              <% }); %>
+            </tr>
+          <% }); %>
+        <% } %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="game">Total</td>
+          <% grid.teams.forEach(function (t) { %>
+            <td class="total <%= t.leading ? 'leading' : '' %>"><%= t.total %></td>
+          <% }); %>
+        </tr>
+      </tfoot>
+    </table>
+  <% } %>
+
+  <!-- Rafraîchissement auto des données -->
+  <script src="/js/display-scroll.js" defer></script>
+</body>
+</html>

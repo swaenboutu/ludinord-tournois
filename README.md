@@ -25,8 +25,9 @@ finale** à élimination par étapes. Un **affichage télé** public complète l
     égalité départagée par le rang de poule (*seed*).
 - **Affichage télé** : écrans publics plein écran (thème LudiNord), rafraîchis
   automatiquement — écran **poule** (jeu en cours, jeu suivant, classement avec
-  défilement auto) et écran **finale** sous forme d'arbre (des premières étapes
-  jusqu'à la demi-finale).
+  défilement auto), écran **phases finales** en arbre (des premières étapes
+  jusqu'à la demi-finale) et écran **finale** (grille jeux × équipes : points par
+  jeu, total, meneur mis en avant).
 
 ## Règles de scoring
 
@@ -100,5 +101,6 @@ L'affichage télé d'un tournoi est accessible sur `/tournaments/:id/display/poo
 - [x] Phase finale (élimination par étapes)
 - [x] Affichage télé (écran phase de poule)
 - [x] Affichage télé phase finale (arbre jusqu'à la demi-finale)
-- [ ] Écran télé dédié à la finale / écrans rotatifs
+- [x] Écran télé dédié à la finale (grille jeux × équipes)
+- [ ] Écrans télé rotatifs
 - [ ] Correctifs finale (cascade de re-qualification, bornage de la taille de départ)

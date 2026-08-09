@@ -192,6 +192,63 @@ body.display {
   color: var(--d-muted);
 }
 
+/* ===== Écran finale : grille jeux × équipes ===== */
+.finale-grid {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 3vh;
+  font-size: 2.2vw;
+}
+
+.finale-grid th,
+.finale-grid td {
+  padding: 1.6vh 1.5vw;
+  border-bottom: 1px solid var(--d-border);
+  text-align: center;
+}
+
+.finale-grid thead th {
+  font-size: 2.8vw;
+  vertical-align: bottom;
+}
+
+.finale-grid thead .swatch {
+  display: inline-block;
+  width: 1.8vw;
+  height: 1.8vw;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  vertical-align: middle;
+  margin-right: 0.5vw;
+}
+
+/* Colonne "jeu" à gauche */
+.finale-grid .game {
+  text-align: left;
+  color: var(--d-muted);
+}
+
+/* Ligne total, mise en valeur */
+.finale-grid tfoot td {
+  border-top: 3px solid var(--d-border);
+  border-bottom: none;
+  font-size: 2.8vw;
+  font-weight: 800;
+}
+
+.finale-grid tfoot .total {
+  color: var(--d-accent);
+}
+
+/* Colonne de l'équipe en tête, mise en avant */
+.finale-grid .leading {
+  background: var(--d-panel-strong);
+}
+
+.finale-grid thead th.leading {
+  color: var(--d-accent);
+}
+
 /* ===== Arbre de la phase finale ===== */
 /* Une colonne par étape (première → demi-finale) ; seule la zone défile si trop haute */
 .bracket {
