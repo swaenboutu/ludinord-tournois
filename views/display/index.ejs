@@ -10,7 +10,9 @@
 <body class="display display-menu">
   <header class="display-header">
     <div class="display-brand">
-      <img class="display-logo" src="/images/ludinord-logo.svg" alt="LudiNord">
+      <a href="/tournaments/<%= tournament.id %>/display" title="Menu de l'affichage TV">
+        <img class="display-logo" src="/images/ludinord-logo.svg" alt="LudiNord">
+      </a>
       <h1><%= tournament.name %></h1>
     </div>
     <span class="display-phase">Affichage</span>
