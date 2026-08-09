@@ -2,17 +2,23 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 import { pool } from '../db/pool';
 import { listPoolStandings } from './standingsRepository';
+import { shuffle, splitBalanced, teamTableCount, assignSolo } from './partyRepository';
 import {
+  FINAL_SCHEMA,
+  RoundRow,
   Party,
-  PartyParticipant,
   RankInput,
   ScoredResult,
-  competitionScores,
-  shuffle,
-  splitBalanced,
-  teamTableCount,
-  assignSolo,
-} from './partyRepository';
+  listRounds,
+  getRound,
+  listEligibleGames as coreListEligibleGames,
+  addRound,
+  removeRound,
+  moveRound,
+  listPartiesForRound as coreListPartiesForRound,
+  saveResults as coreSaveResults,
+  clearRound as coreClearRound,
+} from './phaseCore';
 
 // Une étape de la phase finale (mini-poule à élimination).
 export interface FinalStage {
@@ -155,36 +161,27 @@ export async function getStage(tournamentId: number, stageId: number): Promise<F
   return row ? mapStage(row) : null;
 }
 
-// ---------- Manches d'une étape ----------
+// ---------- Manches d'une étape (délèguent au cœur partagé phaseCore) ----------
 
-const SELECT_FINAL_ROUNDS = `
-  SELECT r.id, r.stage_id, r.game_id, r.round_order,
-         g.name AS game_name, g.is_team_game, g.min_players, g.max_players,
-         (SELECT COUNT(*) FROM final_parties fp WHERE fp.final_round_id = r.id) AS table_count
-    FROM final_rounds r
-    JOIN games g ON g.id = r.game_id`;
-
-function mapFinalRound(row: RowDataPacket): FinalRound {
+// Adapte une manche générique en manche d'étape (scope = étape).
+function toFinalRound(row: RoundRow): FinalRound {
   return {
     id: row.id,
-    stage_id: row.stage_id,
+    stage_id: row.scope_id,
     game_id: row.game_id,
     round_order: row.round_order,
     game_name: row.game_name,
-    is_team_game: row.is_team_game === 1,
+    is_team_game: row.is_team_game,
     min_players: row.min_players,
     max_players: row.max_players,
-    table_count: Number(row.table_count),
+    table_count: row.table_count,
   };
 }
 
 // Manches d'une étape, dans l'ordre.
 export async function listStageRounds(stageId: number): Promise<FinalRound[]> {
-  const [rows] = await pool.execute<RowDataPacket[]>(
-    `${SELECT_FINAL_ROUNDS} WHERE r.stage_id = ? ORDER BY r.round_order`,
-    [stageId],
-  );
-  return rows.map(mapFinalRound);
+  const rows = await listRounds(FINAL_SCHEMA, stageId);
+  return rows.map(toFinalRound);
 }
 
 // Récupère une manche d'étape (bornée au tournoi via l'étape), ou null.
@@ -192,14 +189,8 @@ export async function getFinalRound(
   tournamentId: number,
   roundId: number,
 ): Promise<FinalRound | null> {
-  const [rows] = await pool.execute<RowDataPacket[]>(
-    `${SELECT_FINAL_ROUNDS}
-       JOIN final_stages s ON s.id = r.stage_id
-      WHERE r.id = ? AND s.tournament_id = ? LIMIT 1`,
-    [roundId, tournamentId],
-  );
-  const row = rows[0];
-  return row ? mapFinalRound(row) : null;
+  const row = await getRound(FINAL_SCHEMA, tournamentId, roundId);
+  return row ? toFinalRound(row) : null;
 }
 
 // Jeux ajoutables comme manche d'étape (dispo en finale, pas déjà retenus dans l'étape).
@@ -207,16 +198,7 @@ export async function listEligibleFinalGames(
   tournamentId: number,
   stageId: number,
 ): Promise<{ id: number; name: string }[]> {
-  const [rows] = await pool.execute<RowDataPacket[]>(
-    `SELECT g.id, g.name
-       FROM games g
-      WHERE g.tournament_id = ?
-        AND g.availability IN ('final', 'both')
-        AND g.id NOT IN (SELECT game_id FROM final_rounds WHERE stage_id = ?)
-      ORDER BY g.name`,
-    [tournamentId, stageId],
-  );
-  return rows.map((r) => ({ id: r.id as number, name: r.name as string }));
+  return coreListEligibleGames(FINAL_SCHEMA, tournamentId, stageId);
 }
 
 // Ajoute un jeu en fin de manches d'une étape (ignore si invalide/déjà présent).
@@ -225,82 +207,21 @@ export async function addStageRound(
   stageId: number,
   gameId: number,
 ): Promise<void> {
-  const [games] = await pool.execute<RowDataPacket[]>(
-    `SELECT id FROM games
-      WHERE id = ? AND tournament_id = ? AND availability IN ('final', 'both') LIMIT 1`,
-    [gameId, tournamentId],
-  );
-  if (games.length === 0) {
-    return;
-  }
-  const [exists] = await pool.execute<RowDataPacket[]>(
-    'SELECT id FROM final_rounds WHERE stage_id = ? AND game_id = ? LIMIT 1',
-    [stageId, gameId],
-  );
-  if (exists.length > 0) {
-    return;
-  }
-  const [maxRows] = await pool.execute<RowDataPacket[]>(
-    'SELECT COALESCE(MAX(round_order), 0) + 1 AS next FROM final_rounds WHERE stage_id = ?',
-    [stageId],
-  );
-  await pool.execute(
-    'INSERT INTO final_rounds (stage_id, game_id, round_order) VALUES (?, ?, ?)',
-    [stageId, gameId, Number(maxRows[0].next)],
-  );
+  await addRound(FINAL_SCHEMA, tournamentId, stageId, gameId);
 }
 
 // Retire une manche d'étape (parties tirées en cascade).
 export async function removeStageRound(stageId: number, roundId: number): Promise<void> {
-  await pool.execute('DELETE FROM final_rounds WHERE id = ? AND stage_id = ?', [roundId, stageId]);
+  await removeRound(FINAL_SCHEMA, stageId, roundId);
 }
 
-// Déplace une manche d'étape (échange de rang avec sa voisine, via un rang temporaire).
+// Déplace une manche d'étape (échange de rang avec sa voisine).
 export async function moveStageRound(
   stageId: number,
   roundId: number,
   direction: 'up' | 'down',
 ): Promise<void> {
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-    const [rows] = await connection.execute<RowDataPacket[]>(
-      'SELECT id, round_order FROM final_rounds WHERE stage_id = ? ORDER BY round_order',
-      [stageId],
-    );
-    const index = rows.findIndex((r) => r.id === roundId);
-    if (index === -1) {
-      await connection.rollback();
-      return;
-    }
-    const swapIndex = direction === 'up' ? index - 1 : index + 1;
-    if (swapIndex < 0 || swapIndex >= rows.length) {
-      await connection.rollback();
-      return;
-    }
-    const current = rows[index];
-    const neighbor = rows[swapIndex];
-    const [maxRows] = await connection.execute<RowDataPacket[]>(
-      'SELECT COALESCE(MAX(round_order), 0) + 1 AS temp FROM final_rounds WHERE stage_id = ?',
-      [stageId],
-    );
-    const temp = Number(maxRows[0].temp);
-    await connection.execute('UPDATE final_rounds SET round_order = ? WHERE id = ?', [temp, current.id]);
-    await connection.execute('UPDATE final_rounds SET round_order = ? WHERE id = ?', [
-      current.round_order,
-      neighbor.id,
-    ]);
-    await connection.execute('UPDATE final_rounds SET round_order = ? WHERE id = ?', [
-      neighbor.round_order,
-      current.id,
-    ]);
-    await connection.commit();
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+  await moveRound(FINAL_SCHEMA, stageId, roundId, direction);
 }
 
 // ---------- Équipes d'une étape ----------
@@ -476,13 +397,7 @@ export async function drawStageRound(tournamentId: number, roundId: number): Pro
 
 // Efface les tables tirées d'une manche d'étape (borné au tournoi).
 export async function clearStageRound(tournamentId: number, roundId: number): Promise<void> {
-  await pool.execute(
-    `DELETE fp FROM final_parties fp
-       JOIN final_rounds r ON r.id = fp.final_round_id
-       JOIN final_stages s ON s.id = r.stage_id
-      WHERE fp.final_round_id = ? AND s.tournament_id = ?`,
-    [roundId, tournamentId],
-  );
+  await coreClearRound(FINAL_SCHEMA, tournamentId, roundId);
 }
 
 // Liste les tables d'une manche d'étape avec leurs participants.
@@ -490,109 +405,17 @@ export async function listFinalPartiesForRound(
   tournamentId: number,
   roundId: number,
 ): Promise<Party[]> {
-  const [partyRows] = await pool.execute<RowDataPacket[]>(
-    `SELECT fp.id, fp.table_number, fp.status
-       FROM final_parties fp
-       JOIN final_rounds r ON r.id = fp.final_round_id
-       JOIN final_stages s ON s.id = r.stage_id
-      WHERE fp.final_round_id = ? AND s.tournament_id = ?
-      ORDER BY fp.table_number`,
-    [roundId, tournamentId],
-  );
-  if (partyRows.length === 0) {
-    return [];
-  }
-  const partyIds = partyRows.map((r) => r.id as number);
-
-  const [resultRows] = await pool.query<RowDataPacket[]>(
-    `SELECT fpr.final_party_id AS party_id, fpr.id AS result_id, fpr.finish_rank, fpr.points,
-            fpr.team_id, t.name AS team_name, t.color AS team_color,
-            (SELECT GROUP_CONCAT(pp.pseudo ORDER BY pp.id SEPARATOR ' & ')
-               FROM team_players tp JOIN players pp ON pp.id = tp.player_id
-              WHERE tp.team_id = fpr.team_id) AS team_pseudos,
-            fpr.player_id, pl.pseudo AS player_pseudo, plt.color AS player_team_color
-       FROM final_party_results fpr
-       LEFT JOIN teams t ON t.id = fpr.team_id
-       LEFT JOIN players pl ON pl.id = fpr.player_id
-       LEFT JOIN team_players ptp ON ptp.player_id = fpr.player_id
-       LEFT JOIN teams plt ON plt.id = ptp.team_id
-      WHERE fpr.final_party_id IN (?)
-      ORDER BY fpr.final_party_id, fpr.finish_rank IS NULL, fpr.finish_rank, fpr.id`,
-    [partyIds],
-  );
-
-  const byParty = new Map<number, PartyParticipant[]>();
-  for (const row of resultRows) {
-    const list = byParty.get(row.party_id as number) ?? [];
-    list.push({
-      result_id: row.result_id as number,
-      finish_rank: row.finish_rank,
-      points: row.points,
-      team_id: row.team_id,
-      team_name: row.team_name,
-      team_color: row.team_color,
-      team_pseudos: row.team_pseudos,
-      player_id: row.player_id,
-      player_pseudo: row.player_pseudo,
-      player_team_color: row.player_team_color,
-    });
-    byParty.set(row.party_id as number, list);
-  }
-
-  return partyRows.map((r) => ({
-    id: r.id as number,
-    table_number: r.table_number as number,
-    status: r.status as string,
-    participants: byParty.get(r.id as number) ?? [],
-  }));
+  return coreListPartiesForRound(FINAL_SCHEMA, tournamentId, roundId);
 }
 
-// Enregistre les places d'une table d'étape et calcule les points (même barème que la poule).
+// Enregistre les places d'une table d'étape et calcule les points (barème partagé).
 // Renvoie les scores calculés, ou null si la table n'appartient pas au tournoi / places incomplètes.
 export async function saveFinalPartyResults(
   tournamentId: number,
   partyId: number,
   ranks: RankInput[],
 ): Promise<ScoredResult[] | null> {
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-    const [rows] = await connection.execute<RowDataPacket[]>(
-      `SELECT fpr.id
-         FROM final_party_results fpr
-         JOIN final_parties fp ON fp.id = fpr.final_party_id
-         JOIN final_rounds r ON r.id = fp.final_round_id
-         JOIN final_stages s ON s.id = r.stage_id
-        WHERE fpr.final_party_id = ? AND s.tournament_id = ?`,
-      [partyId, tournamentId],
-    );
-    if (rows.length === 0) {
-      await connection.rollback();
-      return null;
-    }
-    const validIds = new Set(rows.map((r) => r.id as number));
-    const filtered = ranks.filter((r) => validIds.has(r.resultId));
-    const uniqueIds = new Set(filtered.map((r) => r.resultId));
-    if (uniqueIds.size !== validIds.size) {
-      await connection.rollback();
-      return null;
-    }
-    const scores = competitionScores(filtered);
-    for (const scored of scores) {
-      await connection.execute(
-        'UPDATE final_party_results SET finish_rank = ?, points = ? WHERE id = ?',
-        [scored.finishRank, scored.points, scored.resultId],
-      );
-    }
-    await connection.execute("UPDATE final_parties SET status = 'validated' WHERE id = ?", [partyId]);
-    await connection.commit();
-    return scores;
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+  return coreSaveResults(FINAL_SCHEMA, tournamentId, partyId, ranks);
 }
 
 // ---------- Classement et qualification d'une étape ----------

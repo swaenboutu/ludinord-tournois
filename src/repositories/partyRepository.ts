@@ -2,55 +2,18 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { PoolConnection } from 'mysql2/promise';
 
 import { pool } from '../db/pool';
+import {
+  POOL_SCHEMA,
+  Party,
+  RankInput,
+  ScoredResult,
+  listPartiesForRound as coreListPartiesForRound,
+  saveResults as coreSaveResults,
+  clearRound as coreClearRound,
+} from './phaseCore';
 
-// Un participant à une table : soit une équipe (jeu en équipe), soit un joueur (jeu solo).
-export interface PartyParticipant {
-  result_id: number; // id de la ligne party_results (clé de saisie des places)
-  finish_rank: number | null; // place saisie (rang de compétition, null tant que non saisi)
-  points: number | null; // points calculés depuis la place
-  team_id: number | null;
-  team_name: string | null;
-  team_color: string | null;
-  team_pseudos: string | null; // pseudos concaténés (fallback d'affichage si pas de nom)
-  player_id: number | null;
-  player_pseudo: string | null;
-  player_team_color: string | null; // couleur de l'équipe du joueur (pour le repère visuel)
-}
-
-// Place saisie pour un résultat (ligne party_results)
-export interface RankInput {
-  resultId: number;
-  rank: number;
-}
-
-// Résultat scoré : rang de compétition + points calculés.
-export interface ScoredResult {
-  resultId: number;
-  finishRank: number;
-  points: number;
-}
-
-// Barème place -> points, partagé poule/finale.
-// points = N − (nb strictement mieux classés) ; ex æquo = mêmes points, rang suivant sauté.
-export function competitionScores(ranks: RankInput[]): ScoredResult[] {
-  const total = ranks.length;
-  return ranks.map((target) => {
-    const strictlyBetter = ranks.filter((other) => other.rank < target.rank).length;
-    return {
-      resultId: target.resultId,
-      finishRank: strictlyBetter + 1,
-      points: total - strictlyBetter,
-    };
-  });
-}
-
-// Une table de jeu tirée pour une manche, avec ses participants.
-export interface Party {
-  id: number;
-  table_number: number;
-  status: string;
-  participants: PartyParticipant[];
-}
+// Types partagés poule/finale, ré-exportés pour les importateurs existants.
+export type { Party, PartyParticipant, RankInput, ScoredResult } from './phaseCore';
 
 // Bilan d'un tirage : nombre de tables créées et d'unités placées.
 export interface DrawResult {
@@ -279,12 +242,7 @@ export async function drawRound(tournamentId: number, roundId: number): Promise<
 
 // Efface les tables tirées pour une manche (borné à la poule du tournoi)
 export async function clearRound(tournamentId: number, roundId: number): Promise<void> {
-  await pool.execute(
-    `DELETE pa FROM parties pa
-       JOIN pools po ON po.id = pa.pool_id
-      WHERE pa.pool_round_id = ? AND po.tournament_id = ?`,
-    [roundId, tournamentId],
-  );
+  await coreClearRound(POOL_SCHEMA, tournamentId, roundId);
 }
 
 // Liste les tables d'une manche avec leurs participants, prêtes pour l'affichage
@@ -292,67 +250,10 @@ export async function listPartiesForRound(
   tournamentId: number,
   roundId: number,
 ): Promise<Party[]> {
-  const [partyRows] = await pool.execute<RowDataPacket[]>(
-    `SELECT pa.id, pa.table_number, pa.status
-       FROM parties pa
-       JOIN pools po ON po.id = pa.pool_id
-      WHERE pa.pool_round_id = ? AND po.tournament_id = ?
-      ORDER BY pa.table_number`,
-    [roundId, tournamentId],
-  );
-  if (partyRows.length === 0) {
-    return [];
-  }
-
-  const partyIds = partyRows.map((r) => r.id as number);
-
-  // query() (et non execute) développe le tableau pour la clause IN (?)
-  const [resultRows] = await pool.query<RowDataPacket[]>(
-    `SELECT pr.party_id, pr.id AS result_id, pr.finish_rank, pr.points,
-            pr.team_id, t.name AS team_name, t.color AS team_color,
-            (SELECT GROUP_CONCAT(pp.pseudo ORDER BY pp.id SEPARATOR ' & ')
-               FROM team_players tp JOIN players pp ON pp.id = tp.player_id
-              WHERE tp.team_id = pr.team_id) AS team_pseudos,
-            pr.player_id, pl.pseudo AS player_pseudo, plt.color AS player_team_color
-       FROM party_results pr
-       LEFT JOIN teams t ON t.id = pr.team_id
-       LEFT JOIN players pl ON pl.id = pr.player_id
-       LEFT JOIN team_players ptp ON ptp.player_id = pr.player_id
-       LEFT JOIN teams plt ON plt.id = ptp.team_id
-      WHERE pr.party_id IN (?)
-      ORDER BY pr.party_id, pr.finish_rank IS NULL, pr.finish_rank, pr.id`,
-    [partyIds],
-  );
-
-  const byParty = new Map<number, PartyParticipant[]>();
-  for (const row of resultRows) {
-    const list = byParty.get(row.party_id as number) ?? [];
-    list.push({
-      result_id: row.result_id as number,
-      finish_rank: row.finish_rank,
-      points: row.points,
-      team_id: row.team_id,
-      team_name: row.team_name,
-      team_color: row.team_color,
-      team_pseudos: row.team_pseudos,
-      player_id: row.player_id,
-      player_pseudo: row.player_pseudo,
-      player_team_color: row.player_team_color,
-    });
-    byParty.set(row.party_id as number, list);
-  }
-
-  return partyRows.map((r) => ({
-    id: r.id as number,
-    table_number: r.table_number as number,
-    status: r.status as string,
-    participants: byParty.get(r.id as number) ?? [],
-  }));
+  return coreListPartiesForRound(POOL_SCHEMA, tournamentId, roundId);
 }
 
-// Enregistre les places d'une partie et calcule les points de chaque participant.
-// Barème : points = N − (nb de participants strictement mieux classés), N = nb de participants.
-// Les ex æquo (même place saisie) reçoivent les mêmes points, le rang suivant est sauté.
+// Enregistre les places d'une partie et calcule les points (barème partagé).
 // Renvoie les scores calculés, ou null si la partie n'appartient pas au tournoi
 // ou si toutes les places ne sont pas fournies.
 export async function savePartyResults(
@@ -360,49 +261,5 @@ export async function savePartyResults(
   partyId: number,
   ranks: RankInput[],
 ): Promise<ScoredResult[] | null> {
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-
-    // Résultats de cette partie, bornés au tournoi (empêche toute saisie croisée)
-    const [rows] = await connection.execute<RowDataPacket[]>(
-      `SELECT pr.id
-         FROM party_results pr
-         JOIN parties pa ON pa.id = pr.party_id
-         JOIN pools po ON po.id = pa.pool_id
-        WHERE pr.party_id = ? AND po.tournament_id = ?`,
-      [partyId, tournamentId],
-    );
-    if (rows.length === 0) {
-      await connection.rollback();
-      return null;
-    }
-
-    const validIds = new Set(rows.map((r) => r.id as number));
-    const filtered = ranks.filter((r) => validIds.has(r.resultId));
-    // On exige une place pour chaque participant, une seule fois chacun
-    const uniqueIds = new Set(filtered.map((r) => r.resultId));
-    if (uniqueIds.size !== validIds.size) {
-      await connection.rollback();
-      return null;
-    }
-
-    const scores = competitionScores(filtered);
-    for (const scored of scores) {
-      await connection.execute(
-        'UPDATE party_results SET finish_rank = ?, points = ? WHERE id = ?',
-        [scored.finishRank, scored.points, scored.resultId],
-      );
-    }
-
-    await connection.execute("UPDATE parties SET status = 'validated' WHERE id = ?", [partyId]);
-
-    await connection.commit();
-    return scores;
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+  return coreSaveResults(POOL_SCHEMA, tournamentId, partyId, ranks);
 }
