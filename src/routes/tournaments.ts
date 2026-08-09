@@ -5,6 +5,7 @@ import {
   getTournament,
   createTournament,
   closeTournament,
+  reopenTournament,
 } from '../repositories/tournamentRepository';
 import { requireAuth } from '../middleware/requireAuth';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -72,6 +73,15 @@ tournamentsRouter.post(
   '/:id/close',
   asyncHandler(async (req, res) => {
     await closeTournament(Number(req.params.id));
+    res.redirect('/tournaments');
+  }),
+);
+
+// Ré-ouverture d'un tournoi clôturé
+tournamentsRouter.post(
+  '/:id/reopen',
+  asyncHandler(async (req, res) => {
+    await reopenTournament(Number(req.params.id));
     res.redirect('/tournaments');
   }),
 );

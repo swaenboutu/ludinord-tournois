@@ -6,6 +6,7 @@
   --color-border: #d0d0d0;
   --color-error: #cc0000;
   --color-danger: #b03030;
+  --color-warning: #cf6a4c;  /* rouge-orangé doux : action notable mais réversible */
 }
 
 * {
@@ -38,11 +39,19 @@ a {
   color: var(--color-accent);
 }
 
-/* Barre admin (déconnexion), alignée à droite au-dessus du contenu */
+/* Barre admin : logo (retour aux tournois) à gauche, déconnexion à droite */
 .admin-topbar {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-logo {
+  display: block;
+  height: 44px;
+  width: auto;
 }
 
 .admin-topbar form {
@@ -82,6 +91,11 @@ button:hover,
 .button-danger {
   border-color: var(--color-danger);
   background: var(--color-danger);
+}
+
+.button-warning {
+  border-color: var(--color-warning);
+  background: var(--color-warning);
 }
 
 /* ===== Tableaux ===== */

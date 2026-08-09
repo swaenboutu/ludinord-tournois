@@ -48,3 +48,11 @@ export async function closeTournament(id: number): Promise<void> {
     [id],
   );
 }
+
+// Ré-ouvre un tournoi clôturé (statut + date de clôture effacée)
+export async function reopenTournament(id: number): Promise<void> {
+  await pool.execute(
+    "UPDATE tournaments SET status = 'open', closed_at = NULL WHERE id = ?",
+    [id],
+  );
+}

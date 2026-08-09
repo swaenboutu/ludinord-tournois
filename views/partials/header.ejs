@@ -9,6 +9,9 @@
 <body>
   <main class="container <%= (typeof wide !== 'undefined' && wide) ? 'container-wide' : '' %>">
     <div class="admin-topbar">
+      <a href="/tournaments" class="admin-logo-link" title="Retour à la liste des tournois">
+        <img src="/images/ludinord-logo.svg" alt="LudiNord — Tournois" class="admin-logo">
+      </a>
       <form method="post" action="/logout">
         <button type="submit" class="link-button">Déconnexion</button>
       </form>
