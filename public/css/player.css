@@ -160,7 +160,20 @@ a {
 }
 
 .place-title {
+  margin: 0 0 0.3rem;
+}
+
+.place-hint {
   margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--p-muted);
+}
+
+/* Liste ordonnable des joueurs de la table */
+.place-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .tag {
@@ -179,7 +192,28 @@ a {
   align-items: center;
   gap: 0.6rem;
   margin-bottom: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--p-border);
+  border-radius: 8px;
   font-weight: 600;
+}
+
+/* Ligne en cours de déplacement */
+.place-row.dragging {
+  opacity: 0.6;
+  border-color: var(--p-accent);
+}
+
+/* Poignée de glissement (empêche le scroll tactile pendant le drag) */
+.drag-handle {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  color: var(--p-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0 0.15rem;
 }
 
 .place-row .place-name {

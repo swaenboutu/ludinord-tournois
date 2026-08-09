@@ -42,25 +42,29 @@
                   action="/tournaments/<%= tournament.id %>/player/parties/<%= party.id %>/results">
               <input type="hidden" name="q" value="<%= query %>">
               <p class="place-title">
-                Table <strong><%= party.table_number %></strong> — indique la place de chacun
+                Table <strong><%= party.table_number %></strong>
                 <% if (party.status === 'validated') { %><span class="tag">enregistré</span><% } %>
               </p>
-              <% party.participants.forEach(function (p) { %>
-                <%
-                  var isTeam = p.team_id !== null;
-                  var color = isTeam ? p.team_color : (p.player_team_color || '#cccccc');
-                  var label = isTeam
-                    ? ((p.team_name && p.team_name.trim() !== '') ? p.team_name : p.team_pseudos)
-                    : p.player_pseudo;
-                %>
-                <label class="place-row">
-                  <span class="swatch" style="background: <%= color %>"></span>
-                  <span class="place-name"><%= label %></span>
-                  <input type="number" name="rank_<%= p.result_id %>" min="1" inputmode="numeric"
-                         value="<%= p.finish_rank !== null ? p.finish_rank : '' %>"
-                         aria-label="Place de <%= label %>">
-                </label>
-              <% }); %>
+              <p class="place-hint">Glisse les joueurs pour les classer (1<sup>er</sup> en haut), ou saisis la place directement.</p>
+              <ul class="place-rows">
+                <% party.participants.forEach(function (p) { %>
+                  <%
+                    var isTeam = p.team_id !== null;
+                    var color = isTeam ? p.team_color : (p.player_team_color || '#cccccc');
+                    var label = isTeam
+                      ? ((p.team_name && p.team_name.trim() !== '') ? p.team_name : p.team_pseudos)
+                      : p.player_pseudo;
+                  %>
+                  <li class="place-row" data-result-id="<%= p.result_id %>">
+                    <span class="drag-handle" aria-hidden="true" title="Glisser pour classer">↕</span>
+                    <span class="swatch" style="background: <%= color %>"></span>
+                    <span class="place-name"><%= label %></span>
+                    <input type="number" name="rank_<%= p.result_id %>" min="1" inputmode="numeric"
+                           value="<%= p.finish_rank !== null ? p.finish_rank : '' %>"
+                           aria-label="Place de <%= label %>">
+                  </li>
+                <% }); %>
+              </ul>
               <button type="submit">Valider les places</button>
             </form>
           <% }); %>
@@ -107,5 +111,6 @@
       }
     })();
   </script>
+  <script src="/js/player-sort.js" defer></script>
 </body>
 </html>
