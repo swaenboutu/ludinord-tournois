@@ -54,7 +54,7 @@ de poule** (classement des équipes) puis une **phase finale** à élimination p
 | Langage  | TypeScript                                        |
 | Backend  | Node.js + Express                                 |
 | Base     | MySQL 8 (accès via `mysql2`, SQL écrit à la main) |
-| Frontend | Pages server-rendered (EJS) + Alpine.js (léger)   |
+| Frontend | Pages server-rendered (EJS) + JS vanilla minimal    |
 
 ## Prérequis
 
