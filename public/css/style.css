@@ -104,6 +104,14 @@ button:hover,
   background: var(--color-danger);
 }
 
+/* Indicateur "ouvre un nouvel onglet" sur les boutons concernés */
+.button[target="_blank"]::after,
+.tv-button[target="_blank"]::after {
+  content: "↗";
+  margin-left: 0.4em;
+  font-size: 0.9em;
+}
+
 .button-start {
   border-color: var(--color-yellow);
   background: var(--color-yellow);
