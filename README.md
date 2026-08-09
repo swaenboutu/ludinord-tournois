@@ -150,5 +150,4 @@ déconnectés à chaque redémarrage.
 - [x] Écran télé dédié à la finale (grille jeux × équipes)
 - [x] Espace joueur (identification, partie/jeu en cours, scores)
 - [x] Authentification admin (mot de passe haché, écrans publics épargnés)
-- [ ] Écrans télé rotatifs
 - [ ] Correctifs finale (cascade de re-qualification, bornage de la taille de départ)
