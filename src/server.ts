@@ -3,7 +3,7 @@ import path from 'path';
 import express from 'express';
 
 import { config } from './config/env';
-import { checkDatabaseConnection } from './db/pool';
+import { pool, checkDatabaseConnection } from './db/pool';
 import { tournamentsRouter } from './routes/tournaments';
 import { gamesRouter } from './routes/games';
 import { teamsRouter } from './routes/teams';
@@ -24,6 +24,13 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 // Parsing des formulaires et des corps JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Sonde de santé : 200 si la base répond, 503 sinon (pour supervision/déploiement)
+app.get('/health', (_req, res) => {
+  checkDatabaseConnection()
+    .then(() => res.json({ status: 'ok' }))
+    .catch(() => res.status(503).json({ status: 'error' }));
+});
 
 // La racine renvoie vers la liste des tournois (point d'entrée de la config)
 app.get('/', (_req, res) => {
@@ -54,9 +61,36 @@ async function start(): Promise<void> {
     process.exit(1);
   }
 
-  app.listen(config.port, () => {
+  const server = app.listen(config.port, () => {
     console.log(`Serveur démarré sur http://localhost:${config.port}`);
   });
+
+  // Arrêt propre : on cesse d'accepter des requêtes, puis on ferme le pool MySQL.
+  let shuttingDown = false;
+  const shutdown = (signal: string): void => {
+    if (shuttingDown) {
+      return;
+    }
+    shuttingDown = true;
+    console.log(`\n${signal} reçu, arrêt en cours...`);
+    server.close(() => {
+      pool
+        .end()
+        .then(() => {
+          console.log('Arrêt propre terminé.');
+          process.exit(0);
+        })
+        .catch((error) => {
+          console.error('Erreur à la fermeture du pool MySQL :', error);
+          process.exit(1);
+        });
+    });
+    // Filet de sécurité si la fermeture traîne (connexions bloquées)
+    setTimeout(() => process.exit(1), 10000).unref();
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 void start();

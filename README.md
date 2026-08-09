@@ -95,6 +95,8 @@ npm run typecheck  # vérification des types sans émettre
 
 Le serveur écoute sur `http://localhost:3000` (port configurable via `PORT`).
 L'affichage télé d'un tournoi est accessible sur `/tournaments/:id/display/pool`.
+Sonde de santé : `GET /health` (200 si la base répond, 503 sinon). Le serveur
+s'arrête proprement sur SIGINT/SIGTERM (fermeture du pool MySQL).
 
 ## Conventions
 
