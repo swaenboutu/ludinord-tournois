@@ -44,12 +44,14 @@
               <a href="<%= game.rules_url %>" target="_blank" rel="noopener">Lien</a>
             <% } else { %>—<% } %>
           </td>
-          <td class="row-actions">
-            <a href="/tournaments/<%= tournament.id %>/games/<%= game.id %>/edit">Modifier</a>
-            <form method="post" action="/tournaments/<%= tournament.id %>/games/<%= game.id %>/delete"
-                  onsubmit="return confirm('Supprimer ce jeu ?');">
-              <button type="submit" class="button-danger">Supprimer</button>
-            </form>
+          <td>
+            <div class="row-actions">
+              <a href="/tournaments/<%= tournament.id %>/games/<%= game.id %>/edit">Modifier</a>
+              <form method="post" action="/tournaments/<%= tournament.id %>/games/<%= game.id %>/delete"
+                    onsubmit="return confirm('Supprimer ce jeu ?');">
+                <button type="submit" class="button-danger">Supprimer</button>
+              </form>
+            </div>
           </td>
         </tr>
       <% }); %>

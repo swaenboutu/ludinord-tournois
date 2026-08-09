@@ -34,24 +34,28 @@
               <em>non tiré</em>
             <% } %>
           </td>
-          <td class="row-actions">
-            <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/move">
-              <input type="hidden" name="direction" value="up">
-              <button type="submit" <%= i === 0 ? 'disabled' : '' %>>↑</button>
-            </form>
-            <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/move">
-              <input type="hidden" name="direction" value="down">
-              <button type="submit" <%= i === rounds.length - 1 ? 'disabled' : '' %>>↓</button>
-            </form>
+          <td>
+            <div class="row-actions">
+              <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/move">
+                <input type="hidden" name="direction" value="up">
+                <button type="submit" <%= i === 0 ? 'disabled' : '' %>>↑</button>
+              </form>
+              <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/move">
+                <input type="hidden" name="direction" value="down">
+                <button type="submit" <%= i === rounds.length - 1 ? 'disabled' : '' %>>↓</button>
+              </form>
+            </div>
           </td>
-          <td class="row-actions">
-            <a href="<%= basePath %>/rounds/<%= round.id %>/parties">
-              <%= round.table_count > 0 ? 'Voir les tables' : 'Tirer les tables' %>
-            </a>
-            <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/delete"
-                  onsubmit="return confirm('Retirer cette manche ? Les tables tirées seront supprimées.');">
-              <button type="submit" class="button-danger">Retirer</button>
-            </form>
+          <td>
+            <div class="row-actions">
+              <a href="<%= basePath %>/rounds/<%= round.id %>/parties">
+                <%= round.table_count > 0 ? 'Voir les tables' : 'Tirer les tables' %>
+              </a>
+              <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/delete"
+                    onsubmit="return confirm('Retirer cette manche ? Les tables tirées seront supprimées.');">
+                <button type="submit" class="button-danger">Retirer</button>
+              </form>
+            </div>
           </td>
         </tr>
       <% }); %>

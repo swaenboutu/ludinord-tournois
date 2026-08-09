@@ -48,7 +48,8 @@
   noGamesHint: "Tous les jeux de finale sont déjà retenus (ou aucun jeu n'est disponible en finale).",
 }) %>
 
-<h2>Classement de l'étape</h2>
+<details class="collapsible">
+  <summary>Classement de l'étape</summary>
 <% if (standings.length === 0) { %>
   <p>Aucune équipe dans cette étape.</p>
 <% } else { %>
@@ -87,5 +88,6 @@
     </form>
   <% } %>
 <% } %>
+</details>
 
 <%- include('../partials/footer') %>

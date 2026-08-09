@@ -110,6 +110,20 @@ button:hover,
   color: var(--color-text);
 }
 
+/* Boutons de cycle de vie du tournoi : même largeur pour un rendu aligné */
+.status-action {
+  min-width: 7.5rem;
+  text-align: center;
+}
+
+/* Section repliable (ex. classement d'étape), fermée par défaut */
+details.collapsible > summary {
+  cursor: pointer;
+  margin: 1rem 0;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
 /* ===== Fil d'Ariane ===== */
 .breadcrumb {
   margin: 0 0 1.2rem;
