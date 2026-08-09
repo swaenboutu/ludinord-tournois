@@ -13,7 +13,7 @@
   --d-border: rgb(0, 125, 196); /* bordures (nuance plus claire) */
   --d-text: #f4f8fb;
   --d-muted: #bcd4e6; /* texte secondaire, bleuté clair */
-  --d-accent: rgb(255, 210, 0); /* jaune, fort contraste sur le bleu */
+  --d-accent: #fed215; /* jaune, fort contraste sur le bleu */
 }
 
 * {

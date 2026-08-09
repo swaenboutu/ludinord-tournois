@@ -2,11 +2,11 @@
 :root {
   --color-bg: #f5f5f5;
   --color-text: #222222;
-  --color-accent: #3366cc;
+  --color-accent: #32bcee;
   --color-border: #d0d0d0;
   --color-error: #cc0000;
-  --color-danger: #b03030;
-  --color-warning: #cf6a4c;  /* rouge-orangé doux : action notable mais réversible */
+  --color-danger: #e72154;
+  --color-yellow : #fed215;
 }
 
 * {
@@ -64,10 +64,10 @@ a {
   align-items: center;
   gap: 0.35rem;
   padding: 0.4rem 0.95rem;
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--color-danger);
   border-radius: 999px;
   background: #ffffff;
-  color: var(--color-accent);
+  color: var(--color-danger);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -75,7 +75,7 @@ a {
 }
 
 .logout-button:hover {
-  background: var(--color-accent);
+  background: var(--color-danger);
   color: #ffffff;
   opacity: 1;
 }
@@ -104,9 +104,10 @@ button:hover,
   background: var(--color-danger);
 }
 
-.button-warning {
-  border-color: var(--color-warning);
-  background: var(--color-warning);
+.button-start {
+  border-color: var(--color-yellow);
+  background: var(--color-yellow);
+  color: var(--color-text);
 }
 
 /* ===== Fil d'Ariane ===== */
