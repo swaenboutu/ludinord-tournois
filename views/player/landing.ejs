@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= tournament.name %> — Espace joueur</title>
+  <link rel="stylesheet" href="/css/player.css">
+</head>
+<body class="player">
+  <header class="player-header">
+    <img class="player-logo" src="/images/ludinord-logo.svg" alt="LudiNord">
+    <span class="player-tournament"><%= tournament.name %></span>
+  </header>
+
+  <main class="player-main">
+    <h1>Espace joueur</h1>
+    <p class="intro">
+      Bienvenue ! Suis ta partie en cours, le jeu du moment et les scores de ton équipe.
+      Pour commencer, indique ton <strong>pseudo</strong>.
+    </p>
+
+    <% if (error) { %>
+      <ul class="error">
+        <li>Aucun joueur trouvé pour « <%= query %> ». Vérifie l'orthographe.</li>
+      </ul>
+    <% } %>
+
+    <div class="card">
+      <form method="get" action="/tournaments/<%= tournament.id %>/player/board">
+        <label>
+          Ton pseudo
+          <input type="text" name="q" value="<%= query %>" required autofocus maxlength="80">
+        </label>
+        <button type="submit">Continuer</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var KEY = 'ludinord:player:<%= tournament.id %>';
+      var hasError = <%= error ? 'true' : 'false' %>;
+      if (hasError) {
+        localStorage.removeItem(KEY);
+        return;
+      }
+      var saved = localStorage.getItem(KEY);
+      if (saved) {
+        window.location.replace(
+          '/tournaments/<%= tournament.id %>/player/board?q=' + encodeURIComponent(saved),
+        );
+      }
+    })();
+  </script>
+</body>
+</html>

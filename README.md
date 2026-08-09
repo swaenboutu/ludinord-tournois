@@ -28,6 +28,9 @@ finale** à élimination par étapes. Un **affichage télé** public complète l
   défilement auto), écran **phases finales** en arbre (des premières étapes
   jusqu'à la demi-finale) et écran **finale** (grille jeux × équipes : points par
   jeu, total, meneur mis en avant).
+- **Espace joueur** : interface publique (mobile) où un joueur s'identifie par son
+  pseudo ou le nom de son équipe (mémorisé en local) et suit sa partie/jeu en cours
+  (avec lien de règles si renseigné), le total de son équipe et les scores de chacun.
 
 ## Règles de scoring
 
@@ -102,5 +105,6 @@ L'affichage télé d'un tournoi est accessible sur `/tournaments/:id/display/poo
 - [x] Affichage télé (écran phase de poule)
 - [x] Affichage télé phase finale (arbre jusqu'à la demi-finale)
 - [x] Écran télé dédié à la finale (grille jeux × équipes)
+- [x] Espace joueur (identification, partie/jeu en cours, scores)
 - [ ] Écrans télé rotatifs
 - [ ] Correctifs finale (cascade de re-qualification, bornage de la taille de départ)

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= tournament.name %> — Espace joueur</title>
+  <link rel="stylesheet" href="/css/player.css">
+</head>
+<body class="player">
+  <%
+    var me = team.players.find(function (p) { return p.isMe; });
+    var teamName = (team.name && team.name.trim() !== '')
+      ? team.name
+      : team.players.map(function (p) { return p.pseudo; }).join(' & ');
+  %>
+
+  <header class="player-header">
+    <img class="player-logo" src="/images/ludinord-logo.svg" alt="LudiNord">
+    <span class="player-tournament"><%= tournament.name %></span>
+  </header>
+
+  <main class="player-main">
+    <h1><%= me ? ('Salut ' + me.pseudo) : teamName %></h1>
+    <p class="identity">
+      <span class="swatch" style="background: <%= team.color %>"></span>
+      Équipe : <strong><%= teamName %></strong>
+      · <a href="#" id="changeIdentity">changer d'identité</a>
+    </p>
+
+    <section class="card">
+      <h2>Partie en cours</h2>
+      <% if (current) { %>
+        <p>Jeu : <strong><%= current.game_name %></strong></p>
+        <% if (current.rulesUrl) { %>
+          <a class="rules-link" href="<%= current.rulesUrl %>" target="_blank" rel="noopener">📖 Voir les règles</a>
+        <% } %>
+
+        <% if (current.parties.length > 0) { %>
+          <% current.parties.forEach(function (party) { %>
+            <form class="place-form" method="post"
+                  action="/tournaments/<%= tournament.id %>/player/parties/<%= party.id %>/results">
+              <input type="hidden" name="q" value="<%= query %>">
+              <p class="place-title">
+                Table <strong><%= party.table_number %></strong> — indique la place de chacun
+                <% if (party.status === 'validated') { %><span class="tag">enregistré</span><% } %>
+              </p>
+              <% party.participants.forEach(function (p) { %>
+                <%
+                  var isTeam = p.team_id !== null;
+                  var color = isTeam ? p.team_color : (p.player_team_color || '#cccccc');
+                  var label = isTeam
+                    ? ((p.team_name && p.team_name.trim() !== '') ? p.team_name : p.team_pseudos)
+                    : p.player_pseudo;
+                %>
+                <label class="place-row">
+                  <span class="swatch" style="background: <%= color %>"></span>
+                  <span class="place-name"><%= label %></span>
+                  <input type="number" name="rank_<%= p.result_id %>" min="1" inputmode="numeric"
+                         value="<%= p.finish_rank !== null ? p.finish_rank : '' %>"
+                         aria-label="Place de <%= label %>">
+                </label>
+              <% }); %>
+              <button type="submit">Valider les places</button>
+            </form>
+          <% }); %>
+        <% } else { %>
+          <p class="muted">Tu n'es pas encore placé pour cette manche.</p>
+        <% } %>
+      <% } else { %>
+        <p class="muted">Aucune partie en cours pour le moment.</p>
+      <% } %>
+    </section>
+
+    <section class="card">
+      <h2>Scores</h2>
+      <p class="score-total">Total de l'équipe : <strong><%= team.total %></strong> pts</p>
+      <ul class="player-scores">
+        <% team.players.forEach(function (p) { %>
+          <li class="<%= p.isMe ? 'me' : '' %>">
+            <span><%= p.pseudo %><%= p.isMe ? ' (moi)' : '' %></span>
+            <span class="pts"><%= p.points %> pts</span>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var KEY = 'ludinord:player:<%= tournament.id %>';
+      var q = new URLSearchParams(window.location.search).get('q');
+      if (q) {
+        localStorage.setItem(KEY, q);
+      }
+      var change = document.getElementById('changeIdentity');
+      if (change) {
+        change.addEventListener('click', function (event) {
+          event.preventDefault();
+          localStorage.removeItem(KEY);
+          window.location.href = '/tournaments/<%= tournament.id %>/player';
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

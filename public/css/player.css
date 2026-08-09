@@ -1,0 +1,239 @@
+/* ===== Espace joueur (mobile) : thème LudiNord repris de l'affichage TV ===== */
+:root {
+  --p-bg: rgb(0, 91, 146);
+  --p-panel: rgb(0, 72, 116);
+  --p-panel-strong: rgb(0, 110, 176);
+  --p-border: rgb(0, 125, 196);
+  --p-text: #f4f8fb;
+  --p-muted: #bcd4e6;
+  --p-accent: rgb(255, 210, 0);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body.player {
+  margin: 0;
+  min-height: 100vh;
+  padding: 1rem;
+  background: var(--p-bg);
+  color: var(--p-text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.4;
+}
+
+/* En-tête : logo + nom du tournoi */
+.player-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  max-width: 560px;
+  margin: 0 auto 1rem;
+}
+
+.player-logo {
+  height: 48px;
+  width: auto;
+  padding: 0.3rem 0.5rem;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.player-tournament {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.player-main {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.player-main h1 {
+  font-size: 1.6rem;
+  margin: 0.2rem 0 0.6rem;
+}
+
+.player-main h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.6rem;
+  color: var(--p-accent);
+}
+
+.intro {
+  color: var(--p-muted);
+}
+
+/* Cartes (formulaire, sections) */
+.card {
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  background: var(--p-panel);
+  border: 1px solid var(--p-border);
+  border-radius: 12px;
+}
+
+/* Ligne d'identité (équipe + changer) */
+.identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  color: var(--p-muted);
+}
+
+.swatch {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Formulaire */
+label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+input[type="text"] {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.7rem;
+  border: 1px solid var(--p-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #12303f;
+  font-size: 1.1rem;
+}
+
+button {
+  display: inline-block;
+  padding: 0.7rem 1.3rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--p-accent);
+  color: #12303f;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+a {
+  color: var(--p-accent);
+}
+
+/* Message d'erreur */
+.error {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.9rem;
+  list-style: none;
+  background: #7a1620;
+  border: 1px solid #c0392b;
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+/* Partie en cours : numéro de table bien visible */
+.big-table {
+  margin: 0.2rem 0 0;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--p-accent);
+}
+
+.rules-link {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-weight: 600;
+}
+
+/* Formulaire de saisie des places (par table) */
+.place-form {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--p-border);
+}
+
+.place-title {
+  margin: 0 0 0.6rem;
+}
+
+.tag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--p-accent);
+  color: #12303f;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.place-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+
+.place-row .place-name {
+  flex: 1;
+}
+
+.place-row input[type="number"] {
+  width: 4.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--p-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #12303f;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* Scores */
+.score-total {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.score-total strong {
+  color: var(--p-accent);
+}
+
+.player-scores {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.player-scores li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--p-border);
+}
+
+.player-scores li:last-child {
+  border-bottom: none;
+}
+
+.player-scores li.me {
+  color: var(--p-accent);
+  font-weight: 700;
+}
+
+.player-scores .pts {
+  font-weight: 800;
+}
+
+.muted {
+  color: var(--p-muted);
+}
