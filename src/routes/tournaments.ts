@@ -4,6 +4,7 @@ import {
   listTournaments,
   getTournament,
   createTournament,
+  startTournament,
   closeTournament,
   reopenTournament,
 } from '../repositories/tournamentRepository';
@@ -12,12 +13,14 @@ import { asyncHandler } from '../utils/asyncHandler';
 
 export const tournamentsRouter = Router();
 
-// Toutes les routes de gestion des tournois exigent une session admin
-tournamentsRouter.use(requireAuth);
+// Note : ce router est monté sur le préfixe large "/tournaments", qui englobe
+// aussi /tournaments/:id/display et /player (publics). On protège donc chaque
+// route admin individuellement plutôt qu'avec un middleware global de router.
 
 // Liste des tournois
 tournamentsRouter.get(
   '/',
+  requireAuth,
   asyncHandler(async (_req, res) => {
     const tournaments = await listTournaments();
     res.render('tournaments/list', { title: 'Tournois', tournaments });
@@ -25,13 +28,14 @@ tournamentsRouter.get(
 );
 
 // Formulaire de création
-tournamentsRouter.get('/new', (_req, res) => {
+tournamentsRouter.get('/new', requireAuth, (_req, res) => {
   res.render('tournaments/new', { title: 'Nouveau tournoi' });
 });
 
 // Détail / hub de configuration d'un tournoi (défini après /new pour ne pas le capturer)
 tournamentsRouter.get(
   '/:id',
+  requireAuth,
   asyncHandler(async (req, res) => {
     const tournament = await getTournament(Number(req.params.id));
     if (tournament === null) {
@@ -45,6 +49,7 @@ tournamentsRouter.get(
 // Création d'un tournoi
 tournamentsRouter.post(
   '/',
+  requireAuth,
   asyncHandler(async (req, res) => {
     const name = String(req.body.name ?? '').trim();
     const teamSize = Number(req.body.team_size);
@@ -68,9 +73,20 @@ tournamentsRouter.post(
   }),
 );
 
+// Démarrage d'un tournoi planifié
+tournamentsRouter.post(
+  '/:id/start',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    await startTournament(Number(req.params.id));
+    res.redirect('/tournaments');
+  }),
+);
+
 // Clôture d'un tournoi
 tournamentsRouter.post(
   '/:id/close',
+  requireAuth,
   asyncHandler(async (req, res) => {
     await closeTournament(Number(req.params.id));
     res.redirect('/tournaments');
@@ -80,6 +96,7 @@ tournamentsRouter.post(
 // Ré-ouverture d'un tournoi clôturé
 tournamentsRouter.post(
   '/:id/reopen',
+  requireAuth,
   asyncHandler(async (req, res) => {
     await reopenTournament(Number(req.params.id));
     res.redirect('/tournaments');

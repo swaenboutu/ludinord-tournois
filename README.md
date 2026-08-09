@@ -11,7 +11,8 @@ de poule** (classement des équipes) puis une **phase finale** à élimination p
   finale) exige une connexion par mot de passe ; les écrans **TV** et **joueur**
   restent publics. Mot de passe stocké **haché** (scrypt), jamais en clair.
 - **Tournois** : création (avec le **nombre de joueurs par équipe**), hub de
-  configuration, clôture.
+  configuration, et cycle de vie **Planifié → En cours → Clôturé** (démarrer,
+  clôturer, ré-ouvrir).
 - **Jeux** : catalogue par tournoi (durée, capacité mini/maxi, solo ou équipe,
   lien règles, disponibilité poule / finale / les deux). **Import CSV** en lot
   (séparateur `,` ou `;`, sans en-tête).

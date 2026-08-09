@@ -20,10 +20,18 @@
       <% tournaments.forEach(function (t) { %>
         <tr>
           <td><a href="/tournaments/<%= t.id %>"><%= t.name %></a></td>
-          <td><%= t.status === 'open' ? 'En cours' : 'Clôturé' %></td>
+          <td>
+            <%= t.status === 'planned' ? 'Planifié'
+              : (t.status === 'open' ? 'En cours' : 'Clôturé') %>
+          </td>
           <td><%= new Date(t.created_at).toLocaleDateString('fr-FR') %></td>
           <td>
-            <% if (t.status === 'open') { %>
+            <% if (t.status === 'planned') { %>
+              <form method="post" action="/tournaments/<%= t.id %>/start"
+                    onsubmit="return confirm('Démarrer ce tournoi ?');">
+                <button type="submit">Démarrer</button>
+              </form>
+            <% } else if (t.status === 'open') { %>
               <form method="post" action="/tournaments/<%= t.id %>/close"
                     onsubmit="return confirm('Clôturer ce tournoi ?');">
                 <button type="submit" class="button-warning">Clôturer</button>

@@ -7,10 +7,12 @@
 
 <div class="tournament-head">
   <h1 class="tournament-name"><%= tournament.name %></h1>
-  <% if (tournament.status === 'open') { %>
+  <% if (tournament.status === 'planned') { %>
+    <span class="status-badge status-planned"><span class="status-dot"></span>Planifié</span>
+  <% } else if (tournament.status === 'open') { %>
     <span class="status-badge status-open"><span class="status-dot"></span>En cours</span>
   <% } else { %>
-    <span class="status-badge status-closed"><span class="status-dot"></span>Terminé</span>
+    <span class="status-badge status-closed"><span class="status-dot"></span>Clôturé</span>
   <% } %>
 </div>
 <p class="muted">Équipes de <%= tournament.team_size %> joueur<%= tournament.team_size > 1 ? 's' : '' %>.</p>

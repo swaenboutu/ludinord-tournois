@@ -7,7 +7,7 @@ export interface Tournament {
   id: number;
   name: string;
   team_size: number; // nb de joueurs par équipe (fixe pour le tournoi)
-  status: 'open' | 'closed';
+  status: 'planned' | 'open' | 'closed';
   created_at: Date;
   closed_at: Date | null;
 }
@@ -32,13 +32,18 @@ export async function getTournament(id: number): Promise<Tournament | null> {
   return rows[0] ?? null;
 }
 
-// Crée un tournoi (avec sa taille d'équipe) et retourne son identifiant
+// Crée un tournoi (avec sa taille d'équipe), à l'état "planifié"
 export async function createTournament(name: string, teamSize: number): Promise<number> {
   const [result] = await pool.execute<ResultSetHeader>(
-    'INSERT INTO tournaments (name, team_size) VALUES (?, ?)',
+    "INSERT INTO tournaments (name, team_size, status) VALUES (?, ?, 'planned')",
     [name, teamSize],
   );
   return result.insertId;
+}
+
+// Démarre un tournoi planifié (statut -> en cours)
+export async function startTournament(id: number): Promise<void> {
+  await pool.execute("UPDATE tournaments SET status = 'open' WHERE id = ?", [id]);
 }
 
 // Clôture un tournoi (statut + date de clôture)
