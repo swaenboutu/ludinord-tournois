@@ -73,6 +73,10 @@
 
     <section class="card">
       <h2>Scores</h2>
+      <p class="team-position">
+        Position : <strong><%= position.rank === 1 ? '1er' : position.rank + 'e' %></strong>
+        sur <%= position.totalTeams %> équipe<%= position.totalTeams > 1 ? 's' : '' %>
+      </p>
       <p class="score-total">Total de l'équipe : <strong><%= team.total %></strong> pts</p>
       <ul class="player-scores">
         <% team.players.forEach(function (p) { %>

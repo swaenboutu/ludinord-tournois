@@ -198,6 +198,16 @@ a {
 }
 
 /* Scores */
+.team-position {
+  margin: 0 0 0.4rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.team-position strong {
+  color: var(--p-accent);
+}
+
 .score-total {
   margin: 0;
   font-size: 1.3rem;

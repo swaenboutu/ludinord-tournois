@@ -4,6 +4,7 @@ import {
   resolveIdentity,
   getBoardTeam,
   getCurrentParty,
+  getTeamPosition,
 } from '../repositories/playerBoardRepository';
 import { savePartyResults } from '../repositories/partyRepository';
 import { loadTournament } from '../middleware/loadTournament';
@@ -61,7 +62,9 @@ playerRouter.get(
         }
       : null;
 
-    res.render('player/board', { title: 'Espace joueur', team, current, query });
+    const position = await getTeamPosition(tournamentId, identity.teamId);
+
+    res.render('player/board', { title: 'Espace joueur', team, current, position, query });
   }),
 );
 

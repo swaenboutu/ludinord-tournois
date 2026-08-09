@@ -109,6 +109,58 @@ export async function getBoardTeam(
   };
 }
 
+// Position d'une équipe dans le tournoi (rang de compétition + nombre d'équipes).
+export interface TeamPosition {
+  rank: number;
+  totalTeams: number;
+}
+
+// Classe toutes les équipes par total (poule + finale) et renvoie le rang de l'équipe.
+// Rang de compétition : nb d'équipes strictement au-dessus + 1 (ex æquo => même rang).
+export async function getTeamPosition(
+  tournamentId: number,
+  teamId: number,
+): Promise<TeamPosition> {
+  const [rows] = await pool.execute<RowDataPacket[]>(
+    `SELECT t.id AS team_id, COALESCE(tg.pts, 0) + COALESCE(sg.pts, 0) AS total
+       FROM teams t
+       LEFT JOIN (
+         SELECT team_id, SUM(pts) AS pts FROM (
+           SELECT team_id, points AS pts FROM party_results WHERE team_id IS NOT NULL
+           UNION ALL
+           SELECT team_id, points AS pts FROM final_party_results WHERE team_id IS NOT NULL
+         ) team_pts
+         GROUP BY team_id
+       ) tg ON tg.team_id = t.id
+       LEFT JOIN (
+         SELECT tp.team_id, SUM(pts) AS pts FROM (
+           SELECT player_id, points AS pts FROM party_results WHERE player_id IS NOT NULL
+           UNION ALL
+           SELECT player_id, points AS pts FROM final_party_results WHERE player_id IS NOT NULL
+         ) solo_pts
+         JOIN team_players tp ON tp.player_id = solo_pts.player_id
+         GROUP BY tp.team_id
+       ) sg ON sg.team_id = t.id
+      WHERE t.tournament_id = ?`,
+    [tournamentId],
+  );
+
+  const totals = new Map<number, number>();
+  for (const row of rows) {
+    totals.set(row.team_id as number, Number(row.total));
+  }
+  const myTotal = totals.get(teamId) ?? 0;
+
+  let rank = 1;
+  for (const total of totals.values()) {
+    if (total > myTotal) {
+      rank += 1;
+    }
+  }
+
+  return { rank, totalTeams: rows.length };
+}
+
 // Partie/jeu en cours (phase de poule) : première manche tirée mais non entièrement
 // validée ; renvoie le jeu, son lien de règles et les tables de l'équipe / du joueur.
 export async function getCurrentParty(
