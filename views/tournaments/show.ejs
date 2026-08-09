@@ -61,4 +61,25 @@
   </a>
 </div>
 
+
+<div class="hub-grid">
+  <% if (tournament.status === 'planned') { %>
+    <form method="post" action="/tournaments/<%= tournament.id %>/start"
+          onsubmit="return confirm('Démarrer ce tournoi ?');">
+      <button type="submit" class="button-start">Démarrer ce tournois</button>
+    </form>
+  <% } else if (tournament.status === 'open') { %>
+    <form method="post" action="/tournaments/<%= tournament.id %>/close"
+          onsubmit="return confirm('Clôturer ce tournoi ?');">
+      <button type="submit" class="button-danger">Clôturer ce tournois</button>
+    </form>
+  <% } else { %>
+    <form method="post" action="/tournaments/<%= tournament.id %>/reopen"
+          onsubmit="return confirm('Ré-ouvrir ce tournoi ?');">
+      <button type="submit">Ré-ouvrir ce tournois</button>
+    </form>
+  <% } %>
+</div>
+
+
 <%- include('../partials/footer') %>
