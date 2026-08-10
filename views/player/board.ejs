@@ -25,7 +25,7 @@
     <p class="identity">
       <span class="swatch" style="background: <%= team.color %>"></span>
       Équipe : <strong><%= teamName %></strong>
-      · <a href="#" id="changeIdentity">changer d'identité</a>
+      · <a href="/tournaments/<%= tournament.id %>/player" id="changeIdentity">changer d'identité</a>
     </p>
 
     <section class="card">
@@ -33,7 +33,8 @@
       <% if (current) { %>
         <p>Jeu : <strong><%= current.game_name %></strong></p>
         <% if (current.rulesUrl) { %>
-          <a class="rules-link" href="<%= current.rulesUrl %>" target="_blank" rel="noopener">📖 Voir les règles</a>
+          <a class="rules-link" href="<%= current.rulesUrl %>" target="_blank" rel="noopener"
+             aria-label="Voir les règles (nouvel onglet)">📖 Voir les règles ↗</a>
         <% } %>
 
         <% if (current.parties.length > 0) { %>
@@ -92,6 +93,12 @@
         <% }); %>
       </ul>
     </section>
+
+    <% if (current && current.parties.length > 0) { %>
+      <p class="drag-toggle-wrap">
+        <button type="button" id="toggleDrag" class="toggle-drag">Désactiver le glisser-déposer</button>
+      </p>
+    <% } %>
   </main>
 
   <script>
@@ -103,10 +110,9 @@
       }
       var change = document.getElementById('changeIdentity');
       if (change) {
-        change.addEventListener('click', function (event) {
-          event.preventDefault();
+        // Vide l'identité mémorisée ; le lien poursuit ensuite vers la page d'accueil.
+        change.addEventListener('click', function () {
           localStorage.removeItem(KEY);
-          window.location.href = '/tournaments/<%= tournament.id %>/player';
         });
       }
     })();

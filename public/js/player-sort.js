@@ -1,8 +1,16 @@
 // Réordonnancement des joueurs d'une table par glisser-déposer (option en plus
-// de la saisie directe des places). Fonctionne au toucher ET à la souris via les
-// Pointer Events, sans dépendance. Après un déplacement, les champs "place" sont
-// renumérotés d'après l'ordre (1 en haut).
+// de la saisie directe des places). Pointer Events (tactile + souris), sans
+// dépendance. Les poignées sont invisibles aux lecteurs d'écran (aria-hidden) ;
+// la saisie directe reste l'alternative accessible. Un bouton permet de désactiver
+// complètement le glisser-déposer (préférence mémorisée en local).
 (function () {
+  var DRAG_KEY = 'ludinord:player:dragEnabled';
+
+  // Activé par défaut, sauf préférence explicite "off".
+  function dragEnabled() {
+    return localStorage.getItem(DRAG_KEY) !== 'off';
+  }
+
   function renumber(list) {
     var rows = list.querySelectorAll('.place-row');
     for (var i = 0; i < rows.length; i += 1) {
@@ -13,7 +21,6 @@
     }
   }
 
-  // Première ligne (hors celle déplacée) dont le milieu est sous le pointeur.
   function rowAfter(list, y) {
     var rows = Array.prototype.slice.call(list.querySelectorAll('.place-row:not(.dragging)'));
     for (var i = 0; i < rows.length; i += 1) {
@@ -64,7 +71,31 @@
     }
   }
 
+  // Bouton activer/désactiver : bascule la préférence puis recharge.
+  function setupToggle(enabled) {
+    var btn = document.getElementById('toggleDrag');
+    if (!btn) return;
+    btn.textContent = enabled ? 'Désactiver le glisser-déposer' : 'Activer le glisser-déposer';
+    btn.addEventListener('click', function () {
+      localStorage.setItem(DRAG_KEY, enabled ? 'off' : 'on');
+      window.location.reload();
+    });
+  }
+
   function init() {
+    var enabled = dragEnabled();
+    setupToggle(enabled);
+
+    if (!enabled) {
+      // Poignées masquées ; l'indice ne mentionne plus le glisser
+      document.body.classList.add('drag-off');
+      var hints = document.querySelectorAll('.place-hint');
+      for (var h = 0; h < hints.length; h += 1) {
+        hints[h].textContent = 'Saisis la place de chaque joueur.';
+      }
+      return;
+    }
+
     var lists = document.querySelectorAll('.place-rows');
     for (var i = 0; i < lists.length; i += 1) {
       makeSortable(lists[i]);

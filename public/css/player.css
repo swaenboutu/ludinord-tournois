@@ -13,6 +13,14 @@
   box-sizing: border-box;
 }
 
+/* Indicateur de focus clavier bien visible sur le thème bleu */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
 body.player {
   margin: 0;
   min-height: 100vh;
@@ -213,7 +221,25 @@ a {
   color: var(--p-muted);
   font-size: 1.3rem;
   line-height: 1;
-  padding: 0 0.15rem;
+  padding: 0 0.4rem;
+}
+
+/* Glisser-déposer désactivé : on masque les poignées */
+body.drag-off .drag-handle {
+  display: none;
+}
+
+/* Bouton de préférence "activer / désactiver le glisser-déposer" */
+.drag-toggle-wrap {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.toggle-drag {
+  background: transparent;
+  color: var(--p-text);
+  border: 1px solid var(--p-border);
+  font-weight: 600;
 }
 
 .place-row .place-name {
