@@ -1,0 +1,46 @@
+/* Tokens DA LudiNord — extraits de https://ludinord.fr/css/ludinord.css */
+@font-face {
+  font-family: "Ubuntu Condensed";
+  src: url("/fonts/UbuntuCondensed-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ruddy";
+  src: url("/fonts/Ruddy-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Palette officielle */
+  --ln-dark-blue: #17213c;
+  --ln-light-blue: #005b92;
+  --ln-gold: #ffd200;
+
+  /* Surfaces & texte */
+  --ln-surface: #ffffff;
+  --ln-text-on-blue: #ffffff;
+  --ln-text-muted-on-blue: #bcd4e6;
+  --ln-panel: #004874;
+  --ln-panel-strong: #006eb0;
+  --ln-border-soft: #007dc4;
+
+  /* Sémantique */
+  --ln-danger: #c04945;
+  --ln-success: #5e8d57;
+  --ln-success-strong: #405f3a;
+  --ln-error: #c04945;
+
+  /* Typo */
+  --ln-font-body: "Ubuntu Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ln-font-display: "Ruddy", "Ubuntu Condensed", system-ui, sans-serif;
+
+  /* Formes signature (info-bulle / cartes site) */
+  --ln-radius-card: 0 24px;
+  --ln-radius-soft: 12px;
+  --ln-border-thick: 4px solid var(--ln-dark-blue);
+}

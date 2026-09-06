@@ -1,12 +1,18 @@
-/* ===== Base globale ===== */
+/* ===== Admin — thème LudiNord ===== */
+@import url("/css/tokens.css");
+
 :root {
-  --color-bg: #f5f5f5;
-  --color-text: #222222;
-  --color-accent: #32bcee;
-  --color-border: #d0d0d0;
-  --color-error: #cc0000;
-  --color-danger: #e72154;
-  --color-yellow : #fed215;
+  --color-bg: var(--ln-light-blue);
+  --color-surface: var(--ln-surface);
+  --color-text: var(--ln-dark-blue);
+  --color-text-on-blue: var(--ln-text-on-blue);
+  --color-accent: var(--ln-light-blue);
+  --color-gold: var(--ln-gold);
+  --color-border: var(--ln-dark-blue);
+  --color-error: var(--ln-error);
+  --color-danger: var(--ln-danger);
+  --color-success: var(--ln-success-strong);
+  --color-yellow: var(--ln-gold);
 }
 
 * {
@@ -15,96 +21,138 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  font-family: var(--ln-font-body);
   background: var(--color-bg);
-  color: var(--color-text);
+  color: var(--color-text-on-blue);
+  line-height: 1.4;
 }
 
-.container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-/* Pages qui exploitent toute la largeur (ex. tables de la manche) */
-.container-wide {
-  max-width: none;
-}
-
-h1 {
-  color: var(--color-accent);
-}
-
-a {
-  color: var(--color-accent);
-}
-
-/* Barre admin : logo (retour aux tournois) à gauche, déconnexion à droite */
-.admin-topbar {
+/* Barre haute façon menu-barre LudiNord */
+.site-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.55rem 1.25rem;
+  background: var(--ln-dark-blue);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.admin-logo {
-  display: block;
-  height: 44px;
+.site-bar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-on-blue);
+  text-decoration: none;
+}
+
+.site-bar-logo {
+  height: 42px;
   width: auto;
+  padding: 0.2rem 0.45rem;
+  background: #ffffff;
+  border-radius: 8px;
 }
 
-.admin-topbar form {
-  margin: 0;
+.site-bar-title {
+  font-family: var(--ln-font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+  color: var(--color-gold);
 }
 
-/* Bouton de déconnexion : pilule contournée qui se remplit au survol */
 .logout-button {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   padding: 0.4rem 0.95rem;
-  border: 1px solid var(--color-danger);
+  border: 1px solid var(--color-gold);
   border-radius: 999px;
-  background: #ffffff;
-  color: var(--color-danger);
-  font-size: 0.9rem;
+  background: transparent;
+  color: var(--color-gold);
+  font-family: var(--ln-font-body);
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .logout-button:hover {
-  background: var(--color-danger);
-  color: #ffffff;
+  background: var(--color-gold);
+  color: var(--ln-dark-blue);
   opacity: 1;
+}
+
+/* Panneau principal type info-bulle */
+.container {
+  max-width: 860px;
+  margin: 1.5rem auto 2.5rem;
+  padding: 1.4rem 1.5rem 1.8rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: var(--ln-border-thick);
+  border-radius: var(--ln-radius-card);
+}
+
+.container-wide {
+  max-width: min(1200px, calc(100% - 2rem));
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--ln-font-display);
+  color: var(--color-accent);
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 2rem;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+a:hover {
+  color: var(--ln-dark-blue);
+}
+
+/* Compat ancienne topbar (si encore présente) */
+.admin-topbar {
+  display: none;
 }
 
 /* ===== Boutons et liens d'action ===== */
 button,
 .button {
   display: inline-block;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--color-accent);
-  border-radius: 4px;
-  background: var(--color-accent);
-  color: #ffffff;
+  padding: 0.55rem 1.1rem;
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: var(--ln-radius-soft);
+  background: var(--color-gold);
+  color: var(--ln-dark-blue);
+  font-family: var(--ln-font-body);
   font-size: 1rem;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
 }
 
 button:hover,
 .button:hover {
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .button-danger {
   border-color: var(--color-danger);
   background: var(--color-danger);
+  color: #ffffff;
 }
 
-/* Indicateur "ouvre un nouvel onglet" sur les boutons concernés */
 .button[target="_blank"]::after,
 .tv-button[target="_blank"]::after {
   content: "↗";
@@ -113,30 +161,30 @@ button:hover,
 }
 
 .button-start {
-  border-color: var(--color-yellow);
-  background: var(--color-yellow);
-  color: var(--color-text);
+  border-color: var(--ln-dark-blue);
+  background: var(--color-gold);
+  color: var(--ln-dark-blue);
 }
 
-/* Boutons de cycle de vie du tournoi : même largeur pour un rendu aligné */
 .status-action {
   min-width: 7.5rem;
   text-align: center;
 }
 
-/* Section repliable (ex. classement d'étape), fermée par défaut */
 details.collapsible > summary {
   cursor: pointer;
   margin: 1rem 0;
-  font-size: 1.5em;
+  font-family: var(--ln-font-display);
+  font-size: 1.4em;
   font-weight: bold;
+  color: var(--color-accent);
 }
 
 /* ===== Fil d'Ariane ===== */
 .breadcrumb {
   margin: 0 0 1.2rem;
-  font-size: 0.9rem;
-  color: #666666;
+  font-size: 0.95rem;
+  color: #4a6280;
 }
 
 .breadcrumb a {
@@ -150,11 +198,11 @@ details.collapsible > summary {
 
 .breadcrumb-sep {
   margin: 0 0.4rem;
-  color: #999999;
+  color: #8aa0b8;
 }
 
 .breadcrumb-current {
-  color: #333333;
+  color: var(--ln-dark-blue);
   font-weight: 600;
 }
 
@@ -164,20 +212,24 @@ table {
   border-collapse: collapse;
   margin-top: 1rem;
   background: #ffffff;
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: var(--ln-radius-soft);
+  overflow: hidden;
 }
 
 th,
 td {
-  padding: 0.6rem 0.8rem;
-  border-bottom: 1px solid var(--color-border);
+  padding: 0.65rem 0.8rem;
+  border-bottom: 1px solid #d5e2ee;
   text-align: left;
 }
 
 th {
-  background: #ececec;
+  background: var(--ln-dark-blue);
+  color: var(--color-text-on-blue);
+  font-weight: 700;
 }
 
-/* Actions en fin de ligne (lien + formulaire de suppression alignés) */
 .row-actions {
   display: flex;
   gap: 0.6rem;
@@ -192,22 +244,34 @@ th {
 label {
   display: block;
   margin-bottom: 1rem;
+  font-weight: 600;
+  color: var(--ln-dark-blue);
 }
 
 input[type="text"],
 input[type="number"],
 input[type="url"],
+input[type="password"],
 select {
   display: block;
   width: 100%;
   margin-top: 0.3rem;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  padding: 0.55rem 0.65rem;
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: 8px;
+  font-family: var(--ln-font-body);
   font-size: 1rem;
+  color: var(--ln-dark-blue);
+  background: #ffffff;
 }
 
-/* Case à cocher : label en ligne, input non pleine largeur */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 1px;
+}
+
 label.checkbox {
   display: flex;
   align-items: center;
@@ -231,28 +295,26 @@ label.checkbox input {
 }
 
 .success {
-  color: #0a7a28;
+  color: var(--color-success);
   font-weight: bold;
 }
 
-/* Bouton "vider la liste" détaché sous un tableau */
 .list-danger {
   margin-top: 1.5rem;
 }
 
-/* Zone de texte (import CSV) */
 textarea {
   display: block;
   width: 100%;
   margin-top: 0.3rem;
   padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: 8px;
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   font-size: 0.95rem;
+  color: var(--ln-dark-blue);
 }
 
-/* Zone de glisser-déposer du fichier CSV */
 .drop-zone {
   display: flex;
   flex-direction: column;
@@ -260,71 +322,68 @@ textarea {
   gap: 0.6rem;
   margin-bottom: 1rem;
   padding: 1.5rem 1rem;
-  border: 2px dashed var(--color-border);
-  border-radius: 6px;
-  background: #ffffff;
+  border: 2px dashed var(--ln-dark-blue);
+  border-radius: var(--ln-radius-soft);
+  background: #f3f8fc;
   text-align: center;
 }
 
 .drop-zone.dragover {
-  border-color: var(--color-accent);
-  background: #eef3ff;
+  border-color: var(--color-gold);
+  background: #fff8d6;
 }
 
 .drop-zone .drop-hint {
   margin: 0;
-  color: #555555;
+  color: #4a6280;
 }
 
 .drop-zone label.button {
   margin: 0;
 }
 
-/* Exemple de CSV */
 .csv-example {
   padding: 0.8rem 1rem;
-  background: #ffffff;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  background: #f3f8fc;
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: 8px;
   overflow-x: auto;
   font-size: 0.9rem;
 }
 
-/* Groupe de champs (joueurs d'une équipe) */
 fieldset {
   margin: 0 0 1rem;
   padding: 0.8rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: var(--ln-radius-soft);
 }
 
 legend {
   padding: 0 0.4rem;
+  font-family: var(--ln-font-display);
   font-weight: bold;
+  color: var(--color-accent);
 }
 
-/* Champ couleur : input non pleine largeur, aligné avec son libellé */
 label.color-field input[type="color"] {
   width: 3rem;
   height: 2.2rem;
   margin-top: 0.3rem;
   padding: 0;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 4px;
   cursor: pointer;
 }
 
-/* Pastille de couleur du pion dans la liste des équipes */
 .color-swatch {
   display: inline-block;
   width: 1.1rem;
   height: 1.1rem;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 50%;
   vertical-align: middle;
 }
 
-/* Formulaire en ligne (ajout d'une manche : select + bouton alignés) */
 .inline-form {
   display: flex;
   gap: 1rem;
@@ -336,7 +395,6 @@ label.color-field input[type="color"] {
   flex: 1;
 }
 
-/* Boutons de réordonnancement désactivés */
 button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -352,9 +410,9 @@ button:disabled {
 
 .party-card {
   background: #ffffff;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  padding: 0.8rem 1rem;
+  border: var(--ln-border-thick);
+  border-radius: var(--ln-radius-card);
+  padding: 0.9rem 1rem;
 }
 
 .party-card h3 {
@@ -368,31 +426,27 @@ button:disabled {
   padding: 0;
 }
 
-/* Ligne participant : nom (avec pastille) au-dessus, place + points en dessous */
 .participant-list li {
   padding: 0.5rem 0;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid #d5e2ee;
 }
 
 .participant-list li:last-child {
   border-bottom: none;
 }
 
-/* En-tête : pastille + nom */
 .participant-head {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-/* Nom du participant : s'enroule si trop long */
 .participant-name {
   min-width: 0;
   overflow-wrap: anywhere;
   font-weight: bold;
 }
 
-/* Contrôles sous le nom : champ de place à gauche, points à droite */
 .participant-controls {
   display: flex;
   align-items: flex-end;
@@ -401,22 +455,20 @@ button:disabled {
   margin-top: 0.3rem;
 }
 
-/* Libellé "Place" au-dessus de son champ */
 .rank-label {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   margin-bottom: 0;
   font-size: 0.85rem;
-  color: #555555;
+  color: #4a6280;
 }
 
-/* Champ de saisie de la place (petit, non pleine largeur) */
 .rank-input {
   width: 4rem;
   margin-top: 0;
   padding: 0.3rem;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 4px;
   font-size: 1rem;
 }
@@ -428,31 +480,28 @@ button:disabled {
   font-weight: bold;
 }
 
-/* Marge sous le bouton de validation d'une table */
 .party-card button {
   margin-top: 0.8rem;
   width: 100%;
 }
 
-/* Message de retour après soumission AJAX d'une table */
 .card-flash {
   margin: 0.5rem 0 0;
   font-size: 0.9rem;
   font-weight: bold;
-  color: #0a7a28;
+  color: var(--color-success);
 }
 
 .card-flash.is-error {
   color: var(--color-error);
 }
 
-/* Badge "validée" à côté du titre de table */
 .badge {
   display: inline-block;
   margin-left: 0.5rem;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
-  background: #109618;
+  background: var(--ln-success);
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: normal;
@@ -460,17 +509,16 @@ button:disabled {
 }
 
 .hint {
-  color: #555555;
+  color: #4a6280;
   font-size: 0.9rem;
 }
 
-/* Résumé des points sur la page d'une équipe */
 .team-summary {
   margin-bottom: 1.5rem;
   padding: 0.8rem 1rem;
-  background: #ffffff;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
+  background: #f3f8fc;
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: var(--ln-radius-soft);
 }
 
 .team-summary h2 {
@@ -489,16 +537,15 @@ button:disabled {
 
 .team-summary .team-total {
   margin-top: 0.4rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid #d5e2ee;
   padding-top: 0.4rem;
 }
 
 .muted {
-  color: #777777;
+  color: #5a7290;
   font-size: 0.9rem;
 }
 
-/* Puces d'équipes qualifiées (page d'étape) */
 .team-chips {
   list-style: none;
   margin: 0 0 1rem;
@@ -514,31 +561,31 @@ button:disabled {
   gap: 0.4rem;
   padding: 0.3rem 0.6rem;
   background: #ffffff;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 999px;
 }
 
-/* Ligne d'équipe qualifiée dans le classement d'étape */
 tr.qualified {
-  background: #eaf7ea;
+  background: #e8f5ea;
 }
 
-/* ===== Page tournoi : en-tête (nom + statut) ===== */
+/* ===== Page tournoi ===== */
 .tournament-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
-  margin: 1.5rem 0 0.5rem;
+  margin: 0.5rem 0 0.5rem;
 }
 
 .tournament-name {
   margin: 0;
-  font-size: 2.4rem;
+  font-family: var(--ln-font-display);
+  font-size: 2.2rem;
   line-height: 1.1;
+  color: var(--color-accent);
 }
 
-/* Badge de statut bien visible (pastille + libellé) */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -560,24 +607,22 @@ tr.qualified {
 
 .status-planned {
   background: #eaf1fb;
-  color: #2b5f9e;
-  border: 1px solid #2b5f9e;
+  color: var(--ln-light-blue);
+  border: 2px solid var(--ln-light-blue);
 }
 
 .status-open {
-  background: #e6f6ea;
-  color: #0a7a28;
-  border: 1px solid #0a7a28;
+  background: #e8f5ea;
+  color: var(--ln-success-strong);
+  border: 2px solid var(--ln-success);
 }
 
 .status-closed {
   background: #eceff3;
   color: #667085;
-  border: 1px solid #b6bfca;
+  border: 2px solid #b6bfca;
 }
 
-/* ===== Page tournoi : hub ===== */
-/* Affichages TV : boutons foncés (évoquent l'écran), en haut de page */
 .tv-links {
   display: flex;
   flex-wrap: wrap;
@@ -590,25 +635,26 @@ tr.qualified {
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.2rem;
-  background: #0f1115;
-  border: 1px solid #0f1115;
-  border-radius: 6px;
-  color: #ffffff;
+  background: var(--ln-dark-blue);
+  border: 2px solid var(--ln-dark-blue);
+  border-radius: var(--ln-radius-soft);
+  color: var(--color-gold);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .tv-button:hover {
-  opacity: 0.9;
+  background: var(--ln-light-blue);
+  border-color: var(--ln-light-blue);
+  opacity: 1;
 }
 
 .section-hint {
   margin-top: -0.4rem;
-  color: #666666;
+  color: #4a6280;
   font-size: 0.9rem;
 }
 
-/* Cartes de navigation (éléments globaux, phases) */
 .hub-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -622,25 +668,69 @@ tr.qualified {
   gap: 0.3rem;
   padding: 1.1rem 1.2rem;
   background: #ffffff;
-  border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-accent);
-  border-radius: 6px;
+  border: var(--ln-border-thick);
+  border-radius: var(--ln-radius-card);
   color: var(--color-text);
   text-decoration: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .hub-card:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 4px 6px 0 var(--ln-dark-blue);
+  color: var(--color-text);
 }
 
 .hub-title {
-  font-size: 1.2rem;
+  font-family: var(--ln-font-display);
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-accent);
 }
 
 .hub-desc {
-  color: #666666;
-  font-size: 0.9rem;
+  color: #4a6280;
+  font-size: 0.95rem;
+}
+
+/* ===== Login ===== */
+body.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-shell {
+  width: min(420px, 100%);
+  padding: 1.6rem 1.5rem 1.8rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: var(--ln-border-thick);
+  border-radius: var(--ln-radius-card);
+  text-align: center;
+}
+
+.login-logo {
+  height: 72px;
+  width: auto;
+  margin-bottom: 0.8rem;
+}
+
+.login-shell h1 {
+  margin-bottom: 1.2rem;
+}
+
+.login-shell form {
+  text-align: left;
+}
+
+.login-shell .form-actions {
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.login-shell button {
+  min-width: 12rem;
 }

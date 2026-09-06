@@ -1,12 +1,14 @@
-/* ===== Espace joueur (mobile) : thème LudiNord repris de l'affichage TV ===== */
+/* ===== Espace joueur (mobile) — DA LudiNord ===== */
+@import url("/css/tokens.css");
+
 :root {
-  --p-bg: rgb(0, 91, 146);
-  --p-panel: rgb(0, 72, 116);
-  --p-panel-strong: rgb(0, 110, 176);
-  --p-border: rgb(0, 125, 196);
-  --p-text: #f4f8fb;
-  --p-muted: #bcd4e6;
-  --p-accent: #fed215;
+  --p-bg: var(--ln-light-blue);
+  --p-panel: var(--ln-panel);
+  --p-panel-strong: var(--ln-panel-strong);
+  --p-border: var(--ln-border-soft);
+  --p-text: var(--ln-text-on-blue);
+  --p-muted: var(--ln-text-muted-on-blue);
+  --p-accent: var(--ln-gold);
 }
 
 * {
@@ -27,7 +29,7 @@ body.player {
   padding: 1rem;
   background: var(--p-bg);
   color: var(--p-text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--ln-font-body);
   line-height: 1.4;
 }
 
@@ -45,12 +47,15 @@ body.player {
   width: auto;
   padding: 0.3rem 0.5rem;
   background: #ffffff;
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 8px;
 }
 
 .player-tournament {
+  font-family: var(--ln-font-display);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  color: var(--p-accent);
 }
 
 .player-main {
@@ -59,12 +64,15 @@ body.player {
 }
 
 .player-main h1 {
-  font-size: 1.6rem;
+  font-family: var(--ln-font-display);
+  font-size: 1.7rem;
   margin: 0.2rem 0 0.6rem;
+  color: var(--p-accent);
 }
 
 .player-main h2 {
-  font-size: 1.15rem;
+  font-family: var(--ln-font-display);
+  font-size: 1.2rem;
   margin: 0 0 0.6rem;
   color: var(--p-accent);
 }
@@ -77,9 +85,57 @@ body.player {
 .card {
   margin-bottom: 1rem;
   padding: 1rem 1.1rem;
-  background: var(--p-panel);
-  border: 1px solid var(--p-border);
-  border-radius: 12px;
+  background: #ffffff;
+  color: var(--ln-dark-blue);
+  border: 4px solid var(--ln-dark-blue);
+  border-radius: 0 20px;
+}
+
+.card h2 {
+  color: var(--ln-light-blue);
+}
+
+.card .muted,
+.card .place-hint {
+  color: #4a6280;
+}
+
+.card a {
+  color: var(--ln-light-blue);
+}
+
+.card .team-position strong,
+.card .score-total strong,
+.card .player-scores li.me,
+.card .big-table {
+  color: var(--ln-light-blue);
+}
+
+.card .place-form {
+  border-top-color: #d5e2ee;
+}
+
+.card .place-row {
+  background: #f3f8fc;
+  border: 2px solid var(--ln-dark-blue);
+  color: var(--ln-dark-blue);
+}
+
+.card .drag-handle {
+  color: #4a6280;
+}
+
+.card .player-scores li {
+  border-bottom-color: #d5e2ee;
+}
+
+.card .swatch {
+  border-color: var(--ln-dark-blue);
+}
+
+.card .tag {
+  background: var(--p-accent);
+  color: var(--ln-dark-blue);
 }
 
 /* Ligne d'identité (équipe + changer) */
@@ -112,20 +168,22 @@ input[type="text"] {
   width: 100%;
   margin-top: 0.4rem;
   padding: 0.7rem;
-  border: 1px solid var(--p-border);
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 8px;
   background: #ffffff;
-  color: #12303f;
+  color: var(--ln-dark-blue);
+  font-family: var(--ln-font-body);
   font-size: 1.1rem;
 }
 
 button {
   display: inline-block;
   padding: 0.7rem 1.3rem;
-  border: none;
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 8px;
   background: var(--p-accent);
-  color: #12303f;
+  color: var(--ln-dark-blue);
+  font-family: var(--ln-font-body);
   font-size: 1.05rem;
   font-weight: 700;
   cursor: pointer;
@@ -190,7 +248,7 @@ a {
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
   background: var(--p-accent);
-  color: #12303f;
+  color: var(--ln-dark-blue);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -238,7 +296,7 @@ body.drag-off .drag-handle {
 .toggle-drag {
   background: transparent;
   color: var(--p-text);
-  border: 1px solid var(--p-border);
+  border: 2px solid var(--p-accent);
   font-weight: 600;
 }
 
@@ -249,10 +307,11 @@ body.drag-off .drag-handle {
 .place-row input[type="number"] {
   width: 4.5rem;
   padding: 0.5rem;
-  border: 1px solid var(--p-border);
+  border: 2px solid var(--ln-dark-blue);
   border-radius: 8px;
   background: #ffffff;
-  color: #12303f;
+  color: var(--ln-dark-blue);
+  font-family: var(--ln-font-body);
   font-size: 1.1rem;
   text-align: center;
 }

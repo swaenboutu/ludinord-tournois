@@ -1,19 +1,14 @@
-/* ===== Écrans d'affichage TV : sombre, gros contrastes, plein écran ===== */
-@font-face {
-  font-family: "Ubuntu Condensed";
-  src: url("/fonts/UbuntuCondensed-Regular.ttf") format("truetype");
-  font-weight: normal; /* fichier "regular" ; le gras des titres est synthétisé */
-  font-display: swap;
-}
+/* ===== Écrans d'affichage TV — DA LudiNord ===== */
+@import url("/css/tokens.css");
 
 :root {
-  --d-bg: rgb(0, 91, 146); /* fond principal */
-  --d-panel: rgb(0, 72, 116); /* cartes et lignes (nuance plus foncée) */
-  --d-panel-strong: rgb(0, 110, 176); /* zone mise en avant (jeu en cours) */
-  --d-border: rgb(0, 125, 196); /* bordures (nuance plus claire) */
-  --d-text: #f4f8fb;
-  --d-muted: #bcd4e6; /* texte secondaire, bleuté clair */
-  --d-accent: #fed215; /* jaune, fort contraste sur le bleu */
+  --d-bg: var(--ln-light-blue);
+  --d-panel: var(--ln-panel);
+  --d-panel-strong: var(--ln-panel-strong);
+  --d-border: var(--ln-border-soft);
+  --d-text: var(--ln-text-on-blue);
+  --d-muted: var(--ln-text-muted-on-blue);
+  --d-accent: var(--ln-gold);
 }
 
 * {
@@ -32,7 +27,7 @@ body.display {
   padding: 2vw 3vw;
   background: var(--d-bg);
   color: var(--d-text);
-  font-family: "Ubuntu Condensed", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--ln-font-body);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -62,12 +57,15 @@ body.display {
   width: auto;
   padding: 0.5vw 0.8vw;
   background: #ffffff;
+  border: 0.25vw solid var(--ln-dark-blue);
   border-radius: 0.6vw;
 }
 
 .display-header h1 {
   margin: 0;
+  font-family: var(--ln-font-display);
   font-size: 4vw;
+  color: var(--d-accent);
 }
 
 .display-phase {
@@ -87,8 +85,8 @@ body.display {
 
 .game-card {
   background: var(--d-panel);
-  border: 1px solid var(--d-border);
-  border-radius: 1vw;
+  border: 0.35vw solid var(--ln-dark-blue);
+  border-radius: 0 1.2vw;
   padding: 2.5vh 2vw;
   display: flex;
   flex-direction: column;
@@ -98,6 +96,7 @@ body.display {
 .game-card.current {
   background: var(--d-panel-strong);
   border-color: var(--d-accent);
+  box-shadow: 0 0 0 0.2vw var(--d-accent);
 }
 
 .game-label {
@@ -108,6 +107,7 @@ body.display {
 }
 
 .game-card .game-name {
+  font-family: var(--ln-font-display);
   font-size: 4.5vw;
   font-weight: 800;
   line-height: 1.05;
@@ -141,7 +141,9 @@ body.display {
 
 .standings h2 {
   margin: 0 0 1.5vh;
+  font-family: var(--ln-font-display);
   font-size: 2.4vw;
+  color: var(--d-accent);
 }
 
 .standings-list {
@@ -161,8 +163,8 @@ body.display {
   align-items: center;
   gap: 1.5vw;
   background: var(--d-panel);
-  border: 1px solid var(--d-border);
-  border-radius: 0.8vw;
+  border: 0.25vw solid var(--ln-dark-blue);
+  border-radius: 0 0.9vw;
   padding: 1.4vh 2vw;
   font-size: 2.6vw;
 }
@@ -337,15 +339,18 @@ body.display {
 .display-menu .screen-links a {
   display: block;
   padding: 3vh 3vw;
-  background: var(--d-panel);
-  border: 1px solid var(--d-border);
-  border-radius: 1vw;
-  color: var(--d-text);
+  background: #ffffff;
+  border: 0.4vw solid var(--ln-dark-blue);
+  border-radius: 0 1.4vw;
+  color: var(--ln-light-blue);
   text-decoration: none;
+  font-family: var(--ln-font-display);
   font-size: 3vw;
   font-weight: 700;
 }
 
 .display-menu .screen-links a:hover {
   border-color: var(--d-accent);
+  color: var(--ln-dark-blue);
+  box-shadow: 0.35vw 0.45vw 0 var(--ln-dark-blue);
 }
