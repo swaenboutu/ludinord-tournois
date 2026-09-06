@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tournoi Ludinord — <%= title %></title>
   <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+  <header class="site-bar">
+    <a href="/tournaments" class="site-bar-brand" title="Retour à la liste des tournois">
+      <img src="/images/ludinord-logo.svg" alt="LudiNord — Tournois" class="site-bar-logo">
+      <span class="site-bar-title">Tournois</span>
+    </a>
+    <form method="post" action="/logout">
+      <button type="submit" class="logout-button">Déconnexion</button>
+    </form>
+  </header>
   <main class="container <%= (typeof wide !== 'undefined' && wide) ? 'container-wide' : '' %>">
-    <div class="admin-topbar">
-      <a href="/tournaments" class="admin-logo-link" title="Retour à la liste des tournois">
-        <img src="/images/ludinord-logo.svg" alt="LudiNord — Tournois" class="admin-logo">
-      </a>
-      <form method="post" action="/logout">
-        <button type="submit" class="logout-button">Déconnexion</button>
-      </form>
-    </div>
