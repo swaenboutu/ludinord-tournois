@@ -31,3 +31,6 @@ Thumbs.db
 *.swp
 .vscode/*
 !.vscode/extensions.json
+
+# Captures locales temporaires
+tmp-screenshots/

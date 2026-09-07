@@ -10,7 +10,13 @@
   { label: gameLabel },
 ] }) %>
 
-<h1><%= title %></h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1><%= title %></h1>
+    </div>
+  </div>
+</header>
 
 <% if (errors.length > 0) { %>
   <ul class="error">
@@ -61,8 +67,11 @@
   </label>
 
   <div class="form-actions">
-    <button type="submit">Enregistrer</button>
-    <a href="/tournaments/<%= tournament.id %>/games">Annuler</a>
+    <button type="submit">
+      <%- include('../partials/icon', { name: 'check', cssClass: 'icon icon-sm' }) %>
+      Enregistrer
+    </button>
+    <a class="button button-secondary" href="/tournaments/<%= tournament.id %>/games">Annuler</a>
   </div>
 </form>
 

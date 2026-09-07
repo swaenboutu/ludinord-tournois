@@ -61,8 +61,11 @@
   <% }); %>
 
   <div class="form-actions">
-    <button type="submit">Enregistrer</button>
-    <a href="/tournaments/<%= tournament.id %>/teams">Annuler</a>
+    <button type="submit">
+      <%- include('../partials/icon', { name: 'check', cssClass: 'icon icon-sm' }) %>
+      Enregistrer
+    </button>
+    <a class="button button-secondary" href="/tournaments/<%= tournament.id %>/teams">Annuler</a>
   </div>
 </form>
 

@@ -7,19 +7,36 @@
   { label: stage.name },
 ] }) %>
 
-<h1><%= stage.name %></h1>
-<p><%= stage.team_count %> équipes · la moitié (<%= qualifyCount %>) <%= hasNext ? 'passe à l\'étape suivante' : 'remporte le tournoi' %>.</p>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1><%= stage.name %></h1>
+    </div>
+    <p class="page-subtitle"><%= stage.team_count %> équipes · la moitié (<%= qualifyCount %>) <%= hasNext ? 'passe à l\'étape suivante' : 'remporte le tournoi' %>.</p>
+  </div>
+</header>
 
-<h2>Équipes qualifiées</h2>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-green">
+      <%- include('../partials/icon', { name: 'users', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Équipes qualifiées</h2>
+    </div>
+  </div>
 <% if (teams.length === 0) { %>
   <% if (stage.stage_order === 1) { %>
-    <p>Aucune équipe. Qualifie les <%= stage.team_count %> meilleures équipes de la poule.</p>
+    <p class="muted">Aucune équipe. Qualifie les <%= stage.team_count %> meilleures équipes de la poule.</p>
     <form method="post" action="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>/qualify"
           onsubmit="return confirm('Qualifier les meilleures équipes de la poule ? Les tirages de cette étape seront réinitialisés.');">
-      <button type="submit">Qualifier depuis la poule</button>
+      <button type="submit">
+        <%- include('../partials/icon', { name: 'user-plus', cssClass: 'icon icon-sm' }) %>
+        Qualifier depuis la poule
+      </button>
     </form>
   <% } else { %>
-    <p>Les équipes de cette étape seront définies en validant l'étape précédente.</p>
+    <p class="muted">Les équipes de cette étape seront définies en validant l'étape précédente.</p>
   <% } %>
 <% } else { %>
   <ul class="team-chips">
@@ -34,12 +51,24 @@
   <% if (stage.stage_order === 1) { %>
     <form method="post" action="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>/qualify"
           onsubmit="return confirm('Re-qualifier depuis la poule ? Les tirages de cette étape seront réinitialisés.');">
-      <button type="submit">Re-qualifier depuis la poule</button>
+      <button type="submit" class="button-secondary">
+        <%- include('../partials/icon', { name: 'refresh-cw', cssClass: 'icon icon-sm' }) %>
+        Re-qualifier depuis la poule
+      </button>
     </form>
   <% } %>
 <% } %>
+</section>
 
-<h2>Manches</h2>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-purple">
+      <%- include('../partials/icon', { name: 'list-todo', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Manches</h2>
+    </div>
+  </div>
 <%- include('../partials/rounds-manager', {
   basePath: `/tournaments/${tournament.id}/final`,
   rounds,
@@ -47,11 +76,12 @@
   addAction: `/tournaments/${tournament.id}/final/stages/${stage.id}/rounds`,
   noGamesHint: "Tous les jeux de finale sont déjà retenus (ou aucun jeu n'est disponible en finale).",
 }) %>
+</section>
 
 <details class="collapsible">
   <summary>Classement de l'étape</summary>
 <% if (standings.length === 0) { %>
-  <p>Aucune équipe dans cette étape.</p>
+  <p class="muted">Aucune équipe dans cette étape.</p>
 <% } else { %>
   <p class="hint">Points de cette étape uniquement. À égalité, le classement de poule départage.</p>
   <table>
@@ -82,9 +112,12 @@
 
   <% if (hasNext) { %>
     <form method="post" action="/tournaments/<%= tournament.id %>/final/stages/<%= stage.id %>/advance"
-          style="margin-top:1rem"
+          class="tournament-actions"
           onsubmit="return confirm('Valider l\'étape et qualifier les <%= qualifyCount %> meilleures pour l\'étape suivante ? L\'étape suivante sera réinitialisée.');">
-      <button type="submit">Valider l'étape → qualifier les <%= qualifyCount %> meilleures</button>
+      <button type="submit">
+        <%- include('../partials/icon', { name: 'arrow-right', cssClass: 'icon icon-sm' }) %>
+        Valider l'étape → qualifier les <%= qualifyCount %> meilleures
+      </button>
     </form>
   <% } %>
 <% } %>

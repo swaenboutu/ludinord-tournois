@@ -7,6 +7,7 @@
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin-chrome.css">
 </head>
 <body class="login-page">
   <main class="login-shell">
@@ -24,7 +25,10 @@
         <input type="password" name="password" required autofocus>
       </label>
       <div class="form-actions">
-        <button type="submit">Se connecter</button>
+        <button type="submit">
+          <%- include('../partials/icon', { name: 'log-in', cssClass: 'icon icon-sm' }) %>
+          Se connecter
+        </button>
       </div>
     </form>
   </main>

@@ -7,11 +7,17 @@
   { label: 'Classement' },
 ] }) %>
 
-<h1>Classement de la poule</h1>
-<p class="hint">Total = points des jeux en équipe + somme des points des 2 joueurs en jeux solo.</p>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Classement de la poule</h1>
+    </div>
+    <p class="page-subtitle">Total = points des jeux en équipe + somme des points des joueurs en jeux solo.</p>
+  </div>
+</header>
 
 <% if (standings.length === 0) { %>
-  <p>Aucune équipe pour le moment.</p>
+  <p class="muted">Aucune équipe pour le moment.</p>
 <% } else { %>
   <table>
     <thead>

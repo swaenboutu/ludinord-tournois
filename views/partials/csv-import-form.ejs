@@ -17,8 +17,11 @@
     <textarea name="csv" id="csvText" rows="10" placeholder="Colle ici le CSV, ou dépose / choisis un fichier ci-dessus"><%= csv %></textarea>
   </label>
   <div class="form-actions">
-    <button type="submit">Importer</button>
-    <a href="<%= cancelUrl %>">Annuler</a>
+    <button type="submit">
+      <%- include('./icon', { name: 'upload', cssClass: 'icon icon-sm' }) %>
+      Importer
+    </button>
+    <a class="button button-secondary" href="<%= cancelUrl %>">Annuler</a>
   </div>
 </form>
 

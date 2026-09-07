@@ -1,0 +1,12 @@
+<%
+  // Lien TV / espace joueur. Locals: href, label, variant ('tv'|'player').
+  var kind = (typeof variant !== 'undefined' && variant === 'player') ? 'player' : 'tv';
+  var linkClass = kind === 'player' ? 'player-link' : 'tv-button';
+  var iconName = kind === 'player' ? 'gamepad-2' : 'tv';
+  var iconClass = kind === 'player' ? 'icon icon-md is-accent' : 'icon icon-md';
+%>
+<a class="<%= linkClass %>" href="<%= href %>" target="_blank" rel="noopener">
+  <%- include('./icon', { name: iconName, cssClass: iconClass }) %>
+  <span class="link-label"><%= label %></span>
+  <%- include('./icon', { name: 'chevron-right', cssClass: 'icon icon-sm link-arrow' }) %>
+</a>

@@ -7,6 +7,7 @@
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin-chrome.css">
 </head>
 <body>
   <header class="site-bar">
@@ -14,8 +15,11 @@
       <img src="/images/ludinord-logo.svg" alt="LudiNord — Tournois" class="site-bar-logo">
       <span class="site-bar-title">Tournois</span>
     </a>
-    <form method="post" action="/logout">
-      <button type="submit" class="logout-button">Déconnexion</button>
-    </form>
+    <div class="site-bar-actions">
+      <span class="site-bar-avatar" title="Administrateur" aria-hidden="true">A</span>
+      <form method="post" action="/logout">
+        <button type="submit" class="logout-button">Déconnexion</button>
+      </form>
+    </div>
   </header>
   <main class="container <%= (typeof wide !== 'undefined' && wide) ? 'container-wide' : '' %>">

@@ -1,32 +1,40 @@
-<%
-  // Tables d'une manche (tirage + saisie des places), partagé poule / finale.
-  // Locals : basePath (ex. /tournaments/1/pool), round, position, parties, error, emptyHint.
-%>
-<h1>Manche <%= position %> — <%= round.game_name %></h1>
-<p>
-  <%= round.is_team_game ? 'Jeu en équipe' : 'Jeu solo' %> ·
-  <%= round.min_players %>–<%= round.max_players %> joueurs par table
-</p>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Manche <%= position %> — <%= round.game_name %></h1>
+    </div>
+    <p class="page-subtitle">
+      <%= round.is_team_game ? 'Jeu en équipe' : 'Jeu solo' %> ·
+      <%= round.min_players %>–<%= round.max_players %> joueurs par table
+    </p>
+  </div>
+</header>
 
 <% if (typeof error !== 'undefined' && error) { %>
   <ul class="error"><li><%= error %></li></ul>
 <% } %>
 
-<div class="form-actions">
+<div class="page-toolbar">
   <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/draw"
         onsubmit="return <%= parties.length > 0 ? "confirm('Relancer le tirage ? La répartition ET les places saisies seront remplacées.')" : 'true' %>;">
-    <button type="submit"><%= parties.length > 0 ? 'Relancer le tirage' : 'Tirer les tables' %></button>
+    <button type="submit">
+      <%- include('./icon', { name: 'shuffle', cssClass: 'icon icon-sm' }) %>
+      <%= parties.length > 0 ? 'Relancer le tirage' : 'Tirer les tables' %>
+    </button>
   </form>
   <% if (parties.length > 0) { %>
     <form method="post" action="<%= basePath %>/rounds/<%= round.id %>/clear"
           onsubmit="return confirm('Effacer toutes les tables de cette manche ?');">
-      <button type="submit" class="button-danger">Effacer</button>
+      <button type="submit" class="button-ghost-danger">
+        <%- include('./icon', { name: 'trash-2', cssClass: 'icon icon-sm' }) %>
+        Effacer
+      </button>
     </form>
   <% } %>
 </div>
 
 <% if (parties.length === 0) { %>
-  <p><%= emptyHint %></p>
+  <p class="muted"><%= emptyHint %></p>
 <% } else { %>
   <p class="hint">Saisis la place de chaque participant (même numéro = ex æquo). Les points sont calculés à la validation.</p>
   <div class="party-grid">

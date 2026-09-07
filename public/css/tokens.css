@@ -1,4 +1,4 @@
-/* Tokens DA LudiNord — extraits de https://ludinord.fr/css/ludinord.css */
+/* Tokens DA admin — LudiNord, layout carte moderne */
 @font-face {
   font-family: "Ubuntu Condensed";
   src: url("/fonts/UbuntuCondensed-Regular.ttf") format("truetype");
@@ -16,31 +16,55 @@
 }
 
 :root {
-  /* Palette officielle */
+  /* Marque LudiNord */
   --ln-dark-blue: #17213c;
   --ln-light-blue: #005b92;
   --ln-gold: #ffd200;
 
-  /* Surfaces & texte */
+  /* Surfaces admin */
+  --ln-bg: #f1f5f9;
   --ln-surface: #ffffff;
-  --ln-text-on-blue: #ffffff;
-  --ln-text-muted-on-blue: #bcd4e6;
-  --ln-panel: #004874;
-  --ln-panel-strong: #006eb0;
-  --ln-border-soft: #007dc4;
+  --ln-surface-muted: #f8fafc;
+  --ln-border: #e2e8f0;
+  --ln-border-strong: #cbd5e1;
 
-  /* Sémantique */
-  --ln-danger: #c04945;
-  --ln-success: #5e8d57;
-  --ln-success-strong: #405f3a;
-  --ln-error: #c04945;
+  /* Texte */
+  --ln-text: #0f172a;
+  --ln-text-muted: #64748b;
+  --ln-text-on-navy: #ffffff;
+
+  /* Accents sémantiques */
+  --ln-navy: #0f172a;
+  --ln-navy-hover: #1e293b;
+  --ln-yellow: #facc15;
+  --ln-yellow-hover: #eab308;
+  --ln-danger: #ef4444;
+  --ln-danger-soft: #fee2e2;
+  --ln-danger-text: #b91c1c;
+  --ln-success: #16a34a;
+  --ln-success-soft: #dcfce7;
+  --ln-success-text: #15803d;
+
+  /* Pastels icônes */
+  --ln-icon-blue-bg: #dbeafe;
+  --ln-icon-blue: #2563eb;
+  --ln-icon-green-bg: #dcfce7;
+  --ln-icon-green: #16a34a;
+  --ln-icon-purple-bg: #f3e8ff;
+  --ln-icon-purple: #9333ea;
+  --ln-icon-orange-bg: #ffedd5;
+  --ln-icon-orange: #ea580c;
+  --ln-icon-sky-bg: #e0f2fe;
+  --ln-icon-sky: #0284c7;
 
   /* Typo */
   --ln-font-body: "Ubuntu Condensed", system-ui, -apple-system, "Segoe UI", sans-serif;
   --ln-font-display: "Ruddy", "Ubuntu Condensed", system-ui, sans-serif;
 
-  /* Formes signature (info-bulle / cartes site) */
-  --ln-radius-card: 0 24px;
-  --ln-radius-soft: 12px;
-  --ln-border-thick: 4px solid var(--ln-dark-blue);
+  /* Formes */
+  --ln-radius: 14px;
+  --ln-radius-sm: 10px;
+  --ln-radius-pill: 999px;
+  --ln-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 4px 16px rgb(15 23 42 / 6%);
+  --ln-shadow-hover: 0 4px 20px rgb(15 23 42 / 10%);
 }

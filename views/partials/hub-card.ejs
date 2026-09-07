@@ -1,0 +1,14 @@
+<%
+  // Carte hub (Jeux, Équipes, phases…). Locals: href, title, desc, icon, tone.
+  var toneClass = 'is-' + (typeof tone !== 'undefined' ? tone : 'blue');
+%>
+<a class="hub-card" href="<%= href %>">
+  <span class="hub-card-icon <%= toneClass %>">
+    <%- include('./icon', { name: icon, cssClass: 'icon icon-md' }) %>
+  </span>
+  <span class="hub-card-body">
+    <span class="hub-title"><%= title %></span>
+    <span class="hub-desc"><%= desc %></span>
+  </span>
+  <%- include('./icon', { name: 'chevron-right', cssClass: 'icon icon-sm link-arrow' }) %>
+</a>

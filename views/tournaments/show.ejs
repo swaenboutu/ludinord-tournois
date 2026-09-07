@@ -5,81 +5,141 @@
   { label: tournament.name },
 ] }) %>
 
-<div class="tournament-head">
-  <h1 class="tournament-name"><%= tournament.name %></h1>
-  <% if (tournament.status === 'planned') { %>
-    <span class="status-badge status-planned"><span class="status-dot"></span>Planifié</span>
-  <% } else if (tournament.status === 'open') { %>
-    <span class="status-badge status-open"><span class="status-dot"></span>En cours</span>
-  <% } else { %>
-    <span class="status-badge status-closed"><span class="status-dot"></span>Clôturé</span>
-  <% } %>
-</div>
-<p class="muted">Équipes de <%= tournament.team_size %> joueur<%= tournament.team_size > 1 ? 's' : '' %>.</p>
+<%
+  var statusUi = {
+    planned: {
+      label: 'Planifié',
+      className: 'status-planned',
+      cardTitle: 'Tournoi planifié',
+      cardDesc: 'Prêt à démarrer.',
+    },
+    open: {
+      label: 'En cours',
+      className: 'status-open',
+      cardTitle: 'Tournoi en cours',
+      cardDesc: 'Bonne chance à tous !',
+    },
+    closed: {
+      label: 'Clôturé',
+      className: 'status-closed',
+      cardTitle: 'Tournoi clôturé',
+      cardDesc: 'Merci à tous !',
+    },
+  };
+  var ui = statusUi[tournament.status] || statusUi.closed;
+%>
 
-<!-- Affichages TV, mis en avant en haut -->
-<section class="tv-links">
-  <a class="tv-button" href="/tournaments/<%= tournament.id %>/display" target="_blank" rel="noopener">
-    📺 Affichage TV — Menu
-  </a>
-  <a class="tv-button" href="/tournaments/<%= tournament.id %>/display/pool" target="_blank" rel="noopener">
-    📺 Affichage TV — Poule
-  </a>
-  <a class="tv-button" href="/tournaments/<%= tournament.id %>/display/final" target="_blank" rel="noopener">
-    📺 Affichage TV — Phases finales
-  </a>
-  <a class="tv-button" href="/tournaments/<%= tournament.id %>/display/finale" target="_blank" rel="noopener">
-    📺 Affichage TV — Finale
-  </a>
-  <a class="button" href="/tournaments/<%= tournament.id %>/player" target="_blank" rel="noopener">
-    🎮 Espace joueur (lien à partager)
-  </a>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row tournament-head">
+      <h1 class="tournament-name"><%= tournament.name %></h1>
+      <span class="status-badge <%= ui.className %>">
+        <span class="status-dot"></span><%= ui.label %>
+      </span>
+    </div>
+    <p class="page-subtitle">Équipes de <%= tournament.team_size %> joueur<%= tournament.team_size > 1 ? 's' : '' %>.</p>
+  </div>
+  <aside class="status-card">
+    <span class="status-card-icon">
+      <%- include('../partials/icon', { name: 'calendar', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="status-card-body">
+      <span class="status-card-title"><%= ui.cardTitle %></span>
+      <span class="status-card-desc"><%= ui.cardDesc %></span>
+    </div>
+  </aside>
+</header>
+
+<section class="tv-links" aria-label="Affichages et espace joueur">
+  <%- include('../partials/nav-link', { href: `/tournaments/${tournament.id}/display`, label: 'Affichage TV — Menu', variant: 'tv' }) %>
+  <%- include('../partials/nav-link', { href: `/tournaments/${tournament.id}/display/pool`, label: 'Affichage TV — Poule', variant: 'tv' }) %>
+  <%- include('../partials/nav-link', { href: `/tournaments/${tournament.id}/display/final`, label: 'Affichage TV — Phases finales', variant: 'tv' }) %>
+  <%- include('../partials/nav-link', { href: `/tournaments/${tournament.id}/display/finale`, label: 'Affichage TV — Finale', variant: 'tv' }) %>
+  <%- include('../partials/nav-link', { href: `/tournaments/${tournament.id}/player`, label: 'Espace joueur (lien à partager)', variant: 'player' }) %>
 </section>
 
-<h2>Éléments globaux</h2>
-<p class="section-hint">Jeux et équipes — partagés par toutes les phases du tournoi.</p>
-<div class="hub-grid">
-  <a class="hub-card" href="/tournaments/<%= tournament.id %>/games">
-    <span class="hub-title">Jeux</span>
-    <span class="hub-desc">Catalogue des jeux du tournoi</span>
-  </a>
-  <a class="hub-card" href="/tournaments/<%= tournament.id %>/teams">
-    <span class="hub-title">Équipes</span>
-    <span class="hub-desc">Équipes et joueurs</span>
-  </a>
-</div>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-blue">
+      <%- include('../partials/icon', { name: 'box', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Éléments globaux</h2>
+      <p>Jeux et équipes — partagés par toutes les phases du tournoi.</p>
+    </div>
+  </div>
+  <div class="hub-grid">
+    <%- include('../partials/hub-card', {
+      href: `/tournaments/${tournament.id}/games`,
+      title: 'Jeux',
+      desc: 'Catalogue des jeux du tournoi',
+      icon: 'gamepad-2',
+      tone: 'blue',
+    }) %>
+    <%- include('../partials/hub-card', {
+      href: `/tournaments/${tournament.id}/teams`,
+      title: 'Équipes',
+      desc: 'Équipes et joueurs',
+      icon: 'users',
+      tone: 'green',
+    }) %>
+  </div>
+</section>
 
-<h2>Phases du tournoi</h2>
-<div class="hub-grid">
-  <a class="hub-card" href="/tournaments/<%= tournament.id %>/pool">
-    <span class="hub-title">Phase de poule</span>
-    <span class="hub-desc">Manches, tirages et classement</span>
-  </a>
-  <a class="hub-card" href="/tournaments/<%= tournament.id %>/final">
-    <span class="hub-title">Phase finale</span>
-    <span class="hub-desc">Étapes à élimination</span>
-  </a>
-</div>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-gold">
+      <%- include('../partials/icon', { name: 'trophy', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Phases du tournoi</h2>
+      <p>Manches, tirages et classement.</p>
+    </div>
+  </div>
+  <div class="hub-grid">
+    <%- include('../partials/hub-card', {
+      href: `/tournaments/${tournament.id}/pool`,
+      title: 'Phase de poule',
+      desc: 'Manches, tirages et classement',
+      icon: 'list-todo',
+      tone: 'purple',
+    }) %>
+    <%- include('../partials/hub-card', {
+      href: `/tournaments/${tournament.id}/final`,
+      title: 'Phase finale',
+      desc: 'Étapes à élimination',
+      icon: 'trophy',
+      tone: 'orange',
+    }) %>
+  </div>
+</section>
 
-
-<div class="hub-grid">
+<div class="tournament-actions">
   <% if (tournament.status === 'planned') { %>
     <form method="post" action="/tournaments/<%= tournament.id %>/start"
           onsubmit="return confirm('Démarrer ce tournoi ?');">
-      <button type="submit" class="button-start">Démarrer ce tournois</button>
+      <button type="submit" class="button-start">
+        <%- include('../partials/icon', { name: 'play', cssClass: 'icon icon-sm' }) %>
+        Démarrer ce tournoi
+      </button>
     </form>
   <% } else if (tournament.status === 'open') { %>
     <form method="post" action="/tournaments/<%= tournament.id %>/close"
           onsubmit="return confirm('Clôturer ce tournoi ?');">
-      <button type="submit" class="button-danger">Clôturer ce tournois</button>
+      <button type="submit" class="button-ghost-danger">
+        <%- include('../partials/icon', { name: 'trash-2', cssClass: 'icon icon-sm' }) %>
+        Clôturer ce tournoi
+      </button>
     </form>
   <% } else { %>
     <form method="post" action="/tournaments/<%= tournament.id %>/reopen"
           onsubmit="return confirm('Ré-ouvrir ce tournoi ?');">
-      <button type="submit">Ré-ouvrir ce tournois</button>
+      <button type="submit" class="button-secondary">
+        <%- include('../partials/icon', { name: 'rotate-ccw', cssClass: 'icon icon-sm' }) %>
+        Ré-ouvrir ce tournoi
+      </button>
     </form>
   <% } %>
 </div>
-
 
 <%- include('../partials/footer') %>

@@ -6,23 +6,45 @@
   { label: 'Phase de poule' },
 ] }) %>
 
-<h1>Phase de poule</h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Phase de poule</h1>
+    </div>
+    <p class="page-subtitle">Manches, tirages et classement.</p>
+  </div>
+</header>
 
-<p>
-  <a class="tv-button" href="/tournaments/<%= tournament.id %>/display/pool" target="_blank" rel="noopener">
-    📺 Affichage TV — Poule
+<div class="page-toolbar">
+  <%- include('../partials/nav-link', {
+    href: `/tournaments/${tournament.id}/display/pool`,
+    label: 'Affichage TV — Poule',
+    variant: 'tv',
+  }) %>
+  <a class="button button-secondary" href="/tournaments/<%= tournament.id %>/pool/standings">
+    <%- include('../partials/icon', { name: 'medal', cssClass: 'icon icon-sm' }) %>
+    Classement
   </a>
-</p>
+</div>
 
-<h2>Manches</h2>
-<p>Ordre de passage des jeux, joué par toutes les équipes de la poule.</p>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-purple">
+      <%- include('../partials/icon', { name: 'list-todo', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Manches</h2>
+      <p>Ordre de passage des jeux, joué par toutes les équipes de la poule.</p>
+    </div>
+  </div>
 
-<%- include('../partials/rounds-manager', {
-  basePath: `/tournaments/${tournament.id}/pool`,
-  rounds,
-  eligibleGames,
-  addAction: `/tournaments/${tournament.id}/pool/rounds`,
-  noGamesHint: "Tous les jeux de poule sont déjà retenus (ou aucun jeu n'est disponible en poule).",
-}) %>
+  <%- include('../partials/rounds-manager', {
+    basePath: `/tournaments/${tournament.id}/pool`,
+    rounds,
+    eligibleGames,
+    addAction: `/tournaments/${tournament.id}/pool/rounds`,
+    noGamesHint: "Tous les jeux de poule sont déjà retenus (ou aucun jeu n'est disponible en poule).",
+  }) %>
+</section>
 
 <%- include('../partials/footer') %>

@@ -7,7 +7,14 @@
   { label: 'Importer un CSV' },
 ] }) %>
 
-<h1>Importer des équipes (CSV)</h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Importer des équipes (CSV)</h1>
+    </div>
+    <p class="page-subtitle">Ajoute plusieurs équipes d'un coup via un fichier CSV.</p>
+  </div>
+</header>
 
 <% if (imported !== null) { %>
   <p class="success"><%= imported %> équipe<%= imported > 1 ? 's' : '' %> importée<%= imported > 1 ? 's' : '' %> avec succès.</p>
@@ -23,8 +30,17 @@
 <% } %>
 
 <% var teamSize = tournament.team_size; %>
-<h2>Format attendu</h2>
-<p>Une ligne par équipe (<%= teamSize %> joueur<%= teamSize > 1 ? 's' : '' %> par équipe). Colonnes, dans cet ordre :</p>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-green">
+      <%- include('../partials/icon', { name: 'file-spreadsheet', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Format attendu</h2>
+      <p>Une ligne par équipe (<%= teamSize %> joueur<%= teamSize > 1 ? 's' : '' %> par équipe).</p>
+    </div>
+  </div>
+<p>Colonnes, dans cet ordre :</p>
 <ol>
   <li><strong>Nom de l'équipe</strong> — facultatif (par défaut : les pseudos)</li>
   <li><strong>Couleur</strong> — facultative, format <code>#RRGGBB</code> (auto-attribuée si vide)</li>
@@ -41,17 +57,26 @@
 
 <h3>Exemple</h3>
 <%
-  // Exemple généré selon la taille d'équipe : nom;couleur;pseudo1;contact1;...
   var exCells = ['Les Dés Brouillés', '#3366CC'];
   for (var e = 1; e <= teamSize; e++) { exCells.push('Joueur' + e); exCells.push(''); }
 %>
 <pre class="csv-example"><%= exCells.join(';') %></pre>
+</section>
 
-<h2>Importer</h2>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-gold">
+      <%- include('../partials/icon', { name: 'upload', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Importer</h2>
+    </div>
+  </div>
 <%- include('../partials/csv-import-form', {
   formAction: `/tournaments/${tournament.id}/teams/import`,
   cancelUrl: `/tournaments/${tournament.id}/teams`,
   csv,
 }) %>
+</section>
 
 <%- include('../partials/footer') %>

@@ -1,11 +1,23 @@
 <%- include('../partials/header', { title }) %>
 
-<h1>Tournois</h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Tournois</h1>
+    </div>
+    <p class="page-subtitle">Crée et pilote les tournois LudiNord.</p>
+  </div>
+</header>
 
-<p><a class="button" href="/tournaments/new">+ Nouveau tournoi</a></p>
+<div class="page-toolbar">
+  <a class="button" href="/tournaments/new">
+    <%- include('../partials/icon', { name: 'plus', cssClass: 'icon icon-sm' }) %>
+    Nouveau tournoi
+  </a>
+</div>
 
 <% if (tournaments.length === 0) { %>
-  <p>Aucun tournoi pour le moment.</p>
+  <p class="muted">Aucun tournoi pour le moment.</p>
 <% } else { %>
   <table>
     <thead>
@@ -18,11 +30,18 @@
     </thead>
     <tbody>
       <% tournaments.forEach(function (t) { %>
+        <%
+          var statusLabel = t.status === 'planned' ? 'Planifié'
+            : (t.status === 'open' ? 'En cours' : 'Clôturé');
+          var statusClass = t.status === 'planned' ? 'status-planned'
+            : (t.status === 'open' ? 'status-open' : 'status-closed');
+        %>
         <tr>
           <td><a href="/tournaments/<%= t.id %>"><%= t.name %></a></td>
           <td>
-            <%= t.status === 'planned' ? 'Planifié'
-              : (t.status === 'open' ? 'En cours' : 'Clôturé') %>
+            <span class="status-badge <%= statusClass %> tournament-list-status">
+              <span class="status-dot"></span><%= statusLabel %>
+            </span>
           </td>
           <td><%= new Date(t.created_at).toLocaleDateString('fr-FR') %></td>
           <td>
@@ -39,7 +58,7 @@
             <% } else { %>
               <form method="post" action="/tournaments/<%= t.id %>/reopen"
                     onsubmit="return confirm('Ré-ouvrir ce tournoi ?');">
-                <button type="submit" class="status-action">Ré-ouvrir</button>
+                <button type="submit" class="button-secondary status-action">Ré-ouvrir</button>
               </form>
             <% } %>
           </td>

@@ -1,0 +1,392 @@
+/* ===== Admin — chrome (headers, hub, TV, login) ===== */
+
+/* ===== En-tête de page ===== */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-header-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.page-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.page-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--ln-text-muted);
+  font-size: 0.95rem;
+}
+
+.page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0 0 1.25rem;
+}
+
+.status-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 220px;
+  padding: 0.85rem 1rem;
+  background: var(--ln-icon-sky-bg);
+  border: 1px solid #bae6fd;
+  border-radius: var(--ln-radius-sm);
+}
+
+.status-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--ln-icon-sky);
+  box-shadow: var(--ln-shadow);
+}
+
+.status-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.status-card-title {
+  font-weight: 700;
+  color: var(--ln-text);
+}
+
+.status-card-desc {
+  font-size: 0.85rem;
+  color: var(--ln-text-muted);
+}
+
+/* ===== Sections ===== */
+.section {
+  margin: 1.75rem 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.section-icon.is-blue {
+  background: var(--ln-icon-blue-bg);
+  color: var(--ln-icon-blue);
+}
+
+.section-icon.is-gold {
+  background: #fef9c3;
+  color: #ca8a04;
+}
+
+.section-icon.is-purple {
+  background: var(--ln-icon-purple-bg);
+  color: var(--ln-icon-purple);
+}
+
+.section-icon.is-green {
+  background: var(--ln-icon-green-bg);
+  color: var(--ln-icon-green);
+}
+
+.page-toolbar .tv-button {
+  width: auto;
+  max-width: 100%;
+  padding: 0.6rem 1rem;
+}
+
+.section-copy {
+  min-width: 0;
+}
+
+.section-hint,
+.section-copy p {
+  margin: 0.2rem 0 0;
+  color: var(--ln-text-muted);
+  font-size: 0.92rem;
+}
+
+/* ===== Page hub tournoi ===== */
+.tournament-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.tournament-name {
+  margin: 0;
+  font-family: var(--ln-font-display);
+  font-size: 2.1rem;
+  line-height: 1.1;
+  color: var(--ln-text);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--ln-radius-pill);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-badge .status-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-planned {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.status-open {
+  background: var(--ln-success-soft);
+  color: var(--ln-success-text);
+}
+
+.status-closed {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.tv-links {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.tv-button,
+.player-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--ln-radius-sm);
+  text-decoration: none;
+  font-weight: 700;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+}
+
+.tv-button {
+  background: var(--ln-navy);
+  color: #ffffff;
+  border: 1px solid var(--ln-navy);
+}
+
+.tv-button:hover {
+  background: var(--ln-navy-hover);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: var(--ln-shadow-hover);
+}
+
+.tv-button .icon {
+  color: #7dd3fc;
+}
+
+.player-link {
+  background: var(--ln-yellow);
+  color: var(--ln-navy);
+  border: 1px solid transparent;
+}
+
+.player-link:hover {
+  background: var(--ln-yellow-hover);
+  color: var(--ln-navy);
+  transform: translateY(-1px);
+  box-shadow: var(--ln-shadow-hover);
+}
+
+.player-link .icon.is-accent {
+  color: #7c3aed;
+}
+
+.link-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.link-arrow {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .hub-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.hub-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  background: #ffffff;
+  border: 1px solid var(--ln-border);
+  border-radius: var(--ln-radius);
+  color: var(--ln-text);
+  text-decoration: none;
+  box-shadow: var(--ln-shadow);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.hub-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ln-shadow-hover);
+  border-color: var(--ln-border-strong);
+  color: var(--ln-text);
+}
+
+.hub-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.hub-card-icon.is-blue {
+  background: var(--ln-icon-blue-bg);
+  color: var(--ln-icon-blue);
+}
+
+.hub-card-icon.is-green {
+  background: var(--ln-icon-green-bg);
+  color: var(--ln-icon-green);
+}
+
+.hub-card-icon.is-purple {
+  background: var(--ln-icon-purple-bg);
+  color: var(--ln-icon-purple);
+}
+
+.hub-card-icon.is-orange {
+  background: var(--ln-icon-orange-bg);
+  color: var(--ln-icon-orange);
+}
+
+.hub-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.hub-title {
+  font-family: var(--ln-font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ln-text);
+}
+
+.hub-desc {
+  color: var(--ln-text-muted);
+  font-size: 0.92rem;
+}
+
+.hub-card .link-arrow {
+  color: #94a3b8;
+}
+
+.tournament-actions {
+  margin-top: 1.75rem;
+}
+
+/* ===== Liste tournois ===== */
+.tournament-list-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ===== Login ===== */
+body.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse at top, #e2e8f0 0%, transparent 55%),
+    var(--ln-bg);
+}
+
+.login-shell {
+  width: min(420px, 100%);
+  padding: 1.8rem 1.6rem 2rem;
+  background: var(--ln-surface);
+  color: var(--ln-text);
+  border: 1px solid var(--ln-border);
+  border-radius: var(--ln-radius);
+  box-shadow: var(--ln-shadow);
+  text-align: center;
+}
+
+.login-logo {
+  height: 72px;
+  width: auto;
+  margin-bottom: 0.8rem;
+}
+
+.login-shell h1 {
+  margin-bottom: 1.2rem;
+}
+
+.login-shell form {
+  text-align: left;
+}
+
+.login-shell .form-actions {
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.login-shell button {
+  min-width: 12rem;
+}

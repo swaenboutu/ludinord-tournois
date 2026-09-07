@@ -5,7 +5,14 @@
   { label: 'Nouveau tournoi' },
 ] }) %>
 
-<h1>Nouveau tournoi</h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Nouveau tournoi</h1>
+    </div>
+    <p class="page-subtitle">Nomme le tournoi et définis la taille des équipes.</p>
+  </div>
+</header>
 
 <% if (typeof error !== 'undefined') { %>
   <p class="error"><%= error %></p>
@@ -21,8 +28,11 @@
     <input type="number" name="team_size" value="2" min="1" max="20" required>
   </label>
   <div class="form-actions">
-    <button type="submit">Créer</button>
-    <a href="/tournaments">Annuler</a>
+    <button type="submit">
+      <%- include('../partials/icon', { name: 'check', cssClass: 'icon icon-sm' }) %>
+      Créer
+    </button>
+    <a class="button button-secondary" href="/tournaments">Annuler</a>
   </div>
 </form>
 

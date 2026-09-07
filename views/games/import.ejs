@@ -7,7 +7,14 @@
   { label: 'Importer un CSV' },
 ] }) %>
 
-<h1>Importer des jeux (CSV)</h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Importer des jeux (CSV)</h1>
+    </div>
+    <p class="page-subtitle">Ajoute plusieurs jeux d'un coup via un fichier CSV.</p>
+  </div>
+</header>
 
 <% if (imported !== null) { %>
   <p class="success"><%= imported %> jeu<%= imported > 1 ? 'x' : '' %> importé<%= imported > 1 ? 's' : '' %> avec succès.</p>
@@ -22,8 +29,17 @@
   </ul>
 <% } %>
 
-<h2>Format attendu</h2>
-<p>Une ligne par jeu, sans ligne d'en-tête. Colonnes, dans cet ordre :</p>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-blue">
+      <%- include('../partials/icon', { name: 'file-spreadsheet', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Format attendu</h2>
+      <p>Une ligne par jeu, sans ligne d'en-tête.</p>
+    </div>
+  </div>
+<p>Colonnes, dans cet ordre :</p>
 <ol>
   <li><strong>Nom du jeu</strong> — obligatoire</li>
   <li><strong>Durée</strong> (minutes) — facultative (entier ≥ 0)</li>
@@ -42,12 +58,22 @@
 <pre class="csv-example">Catan;90;3;4;non;https://example.com/catan;both
 Time's Up;30;4;12;oui;;poule
 Skull;15;3;6;non;;finale</pre>
+</section>
 
-<h2>Importer</h2>
+<section class="section">
+  <div class="section-head">
+    <span class="section-icon is-gold">
+      <%- include('../partials/icon', { name: 'upload', cssClass: 'icon icon-md' }) %>
+    </span>
+    <div class="section-copy">
+      <h2>Importer</h2>
+    </div>
+  </div>
 <%- include('../partials/csv-import-form', {
   formAction: `/tournaments/${tournament.id}/games/import`,
   cancelUrl: `/tournaments/${tournament.id}/games`,
   csv,
 }) %>
+</section>
 
 <%- include('../partials/footer') %>

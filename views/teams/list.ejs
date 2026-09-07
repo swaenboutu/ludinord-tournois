@@ -6,15 +6,28 @@
   { label: 'Équipes' },
 ] }) %>
 
-<h1>Équipes</h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Équipes</h1>
+    </div>
+    <p class="page-subtitle">Équipes et joueurs du tournoi.</p>
+  </div>
+</header>
 
-<p>
-  <a class="button" href="/tournaments/<%= tournament.id %>/teams/new">+ Nouvelle équipe</a>
-  <a class="button" href="/tournaments/<%= tournament.id %>/teams/import">Importer un CSV</a>
-</p>
+<div class="page-toolbar">
+  <a class="button" href="/tournaments/<%= tournament.id %>/teams/new">
+    <%- include('../partials/icon', { name: 'plus', cssClass: 'icon icon-sm' }) %>
+    Nouvelle équipe
+  </a>
+  <a class="button button-secondary" href="/tournaments/<%= tournament.id %>/teams/import">
+    <%- include('../partials/icon', { name: 'upload', cssClass: 'icon icon-sm' }) %>
+    Importer un CSV
+  </a>
+</div>
 
 <% if (teams.length === 0) { %>
-  <p>Aucune équipe pour le moment.</p>
+  <p class="muted">Aucune équipe pour le moment.</p>
 <% } else { %>
   <table>
     <thead>
@@ -29,7 +42,6 @@
     <tbody>
       <% teams.forEach(function (team) { %>
         <%
-          // Nom d'affichage : le nom saisi, sinon les pseudos concaténés
           var pseudos = team.players.map(function (p) { return p.pseudo; });
           var displayName = team.name && team.name.trim() !== ''
             ? team.name

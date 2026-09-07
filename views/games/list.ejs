@@ -6,15 +6,28 @@
   { label: 'Jeux' },
 ] }) %>
 
-<h1>Jeux</h1>
+<header class="page-header">
+  <div class="page-header-main">
+    <div class="page-title-row">
+      <h1>Jeux</h1>
+    </div>
+    <p class="page-subtitle">Catalogue des jeux du tournoi.</p>
+  </div>
+</header>
 
-<p>
-  <a class="button" href="/tournaments/<%= tournament.id %>/games/new">+ Nouveau jeu</a>
-  <a class="button" href="/tournaments/<%= tournament.id %>/games/import">Importer un CSV</a>
-</p>
+<div class="page-toolbar">
+  <a class="button" href="/tournaments/<%= tournament.id %>/games/new">
+    <%- include('../partials/icon', { name: 'plus', cssClass: 'icon icon-sm' }) %>
+    Nouveau jeu
+  </a>
+  <a class="button button-secondary" href="/tournaments/<%= tournament.id %>/games/import">
+    <%- include('../partials/icon', { name: 'upload', cssClass: 'icon icon-sm' }) %>
+    Importer un CSV
+  </a>
+</div>
 
 <% if (games.length === 0) { %>
-  <p>Aucun jeu pour le moment.</p>
+  <p class="muted">Aucun jeu pour le moment.</p>
 <% } else { %>
   <table>
     <thead>
